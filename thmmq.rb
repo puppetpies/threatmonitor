@@ -48,8 +48,8 @@ module Thm
     
     def initialize
       @mqhost = "127.0.0.1"
-      @mquser = "brian"
-      @mqpass = "3gtskl9L"
+      @mquser = "traffic"
+      @mqpass = "dk3rbi9l"
       @mqvhost = "/"
       @dbhost = "127.0.0.1"
       @dbuser = "threatmonitor"
