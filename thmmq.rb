@@ -300,7 +300,7 @@ module Thm
         puts "Queue: #{@queueprefix}_ippacket"
         queue    = channel.queue("#{@queueprefix}_ippacket")
         exchange = channel.direct("")
-  
+        t = 0
         queue.bind("#{@queueprefix}_ippacket").subscribe do |metadata, body|
             #puts "MSGID: [#{n}] Received #{body}"
             ipdata = YAML.load(body).to_a
@@ -331,7 +331,11 @@ module Thm
             ip_packet << "'#{ipdatadim["ip_tos"]}',"
             ip_packet << "'#{ipdatadim["ip_ttl"]}',"
             ip_packet << "'#{ipdatadim["ip_ver"]}');"
-            puts "MSGID: [#{n}] Generated SQL: #{ip_packet}"
+            if t == 50
+              puts "MSGID: [#{n}] Generated SQL: #{ip_packet}"
+              t = 0
+            end
+            t = t + 1 unless t == 50
             res = @conn.query("#{ip_packet}")
             @conn.save
             n = n + 1
@@ -354,7 +358,7 @@ module Thm
         puts "Queue: #{@queueprefix}_tcppacket"
         queue    = channel.queue("#{@queueprefix}_tcppacket")
         exchange = channel.direct("")
-  
+        t = 0
         queue.bind("#{@queueprefix}_tcppacket").subscribe do |metadata, body|
           #puts "MSGID: [#{n}] Received #{body}"
           tcpdata = YAML.load(body).to_a
@@ -398,7 +402,11 @@ module Thm
             tcp_packet << "'N',"
           end
           tcp_packet << "#{tcpdatadim["tcp_off"]}, #{tcpdatadim["tcp_hlen"]}, #{tcpdatadim["tcp_seq"]}, #{tcpdatadim["tcp_sum"]}, #{tcpdatadim["tcp_sport"]}, #{tcpdatadim["tcp_urp"]}, #{tcpdatadim["tcp_win"]});"
-          puts "MSGID: [#{n}] Generated SQL: #{tcp_packet}"
+          if t == 50
+            puts "MSGID: [#{n}] Generated SQL: #{tcp_packet}"
+            t = 0
+          end
+          t = t + 1 unless t == 50
           res = @conn.query("#{tcp_packet}")
           @conn.save
           n = n + 1
@@ -421,7 +429,7 @@ module Thm
         puts "Queue: #{@queueprefix}_udppacket"
         queue    = channel.queue("#{@queueprefix}_udppacket")
         exchange = channel.direct("")
-  
+        t = 0
         queue.bind("#{@queueprefix}_udppacket").subscribe do |metadata, body|        
           #puts "MSGID: [#{n}] Received #{body}"
           udpdata = YAML.load(body).to_a
@@ -440,7 +448,11 @@ module Thm
           udp_packet << "'#{udpdatadim["udp_len"]}',"
           udp_packet << "'#{udpdatadim["udp_sum"]}',"
           udp_packet << "'#{udpdatadim["udp_sport"]}');"
-          puts "MSGID: [#{n}] Generated SQL: #{udp_packet}"
+          if t == 50
+            puts "MSGID: [#{n}] Generated SQL: #{udp_packet}"
+            t = 0
+          end
+          t = t + 1 unless t == 50
           res = @conn.query("#{udp_packet}")
           @conn.save
           n = n + 1
