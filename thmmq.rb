@@ -19,6 +19,11 @@ require 'pcaplet'
 require './datalayerlight.rb'
 include Pcap
 
+trap("INT") {
+  puts "Exiting Reactor thread ..."
+  EventMachine.stop
+}
+          
 module Tools
 
   class << self
