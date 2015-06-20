@@ -48,12 +48,12 @@ module Thm
     
     def initialize
       @mqhost = "127.0.0.1"
-      @mquser = "testuser"
-      @mqpass = "testuser"
+      @mquser = "brian"
+      @mqpass = "3gtskl9L"
       @mqvhost = "/"
       @dbhost = "127.0.0.1"
-      @dbuser = "testuser"
-      @dbpass = "testuser"
+      @dbuser = "threatmonitor"
+      @dbpass = "dk3rbi9l"
       @dbname = "threatmonitor"
       @queueprefix = "cactus" # Queue names will be come prefixed with cactus_ippacket etc ..
       # Implement tblname for table freedom
@@ -293,7 +293,7 @@ module Thm
       banner = "\e[1;34mStage 1: Load IP Packet data \e[0m\ \n"
       banner << "\e[1;34m=================================\e[0m\ \n"
       puts banner
-      EventMachine.run do
+      EM.run do
         connection = AMQP.connect(:host => "#{@mqhost}", :user => "#{@mquser}", :pass => "#{@mqpass}", :vhost => "#{@mqvhost}")
         puts "Connected to AMQP broker. Running #{AMQP::VERSION}"
         channel  = AMQP::Channel.new(connection)
@@ -347,7 +347,7 @@ module Thm
       banner = "\e[1;34mStage 2: Load TCP Packet data \e[0m\ \n"
       banner << "\e[1;34m=================================\e[0m\ \n"
       puts banner
-      EventMachine.run do
+      EM.run do
         connection = AMQP.connect(:host => "#{@mqhost}", :user => "#{@mquser}", :pass => "#{@mqpass}", :vhost => "#{@mqvhost}")
         puts "Connected to AMQP broker. Running #{AMQP::VERSION}"
         channel  = AMQP::Channel.new(connection)
@@ -414,7 +414,7 @@ module Thm
       banner = "\e[1;34mStage 2: Load UDP Packet data \e[0m\ \n"
       banner << "\e[1;34m=================================\e[0m\ \n"
       puts banner
-      EventMachine.run do
+      EM.run do
         connection = AMQP.connect(:host => "#{@mqhost}", :user => "#{@mquser}", :pass => "#{@mqpass}", :vhost => "#{@mqvhost}")
         puts "Connected to AMQP broker. Running #{AMQP::VERSION}"
         channel  = AMQP::Channel.new(connection)
