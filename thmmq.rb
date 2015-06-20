@@ -48,12 +48,12 @@ module Thm
     
     def initialize
       @mqhost = "127.0.0.1"
-      @mquser = "brian"
-      @mqpass = "3gtskl9L"
+      @mquser = "testuser"
+      @mqpass = "testuser"
       @mqvhost = "/"
       @dbhost = "127.0.0.1"
-      @dbuser = "threatmonitor"
-      @dbpass = "dk3rbi9l"
+      @dbuser = "testuser"
+      @dbpass = "testuser"
       @dbname = "threatmonitor"
       @queueprefix = "cactus" # Queue names will be come prefixed with cactus_ippacket etc ..
       # Implement tblname for table freedom
