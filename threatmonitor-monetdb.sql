@@ -35,7 +35,7 @@ CREATE TABLE "threatmonitor".tcppacket (
   "tcp_urg" char(1) DEFAULT NULL,
   "tcp_off" int DEFAULT NULL,
   "tcp_hlen" int DEFAULT NULL,
-  "tcp_seq" int DEFAULT NULL,
+  "tcp_seq" bigint DEFAULT NULL,
   "tcp_sum" char(10) DEFAULT NULL,
   "tcp_sport" int DEFAULT NULL,
   "tcp_urp" char(10) DEFAULT NULL,
