@@ -17,7 +17,7 @@ You'll need PCAP / Development Header files
 gem build pcap.gemspec
 gem install pcap-0.7.7.gem 
 
-GEMS: AMQP, Bunny, MonetDB, pcaplet, guid
+GEMS: AMQP, Bunny, Eventmachine, guid, MonetDB, pcaplet
 
 This is all experimental but i believe it works well so far.
 
