@@ -20,8 +20,12 @@ require './datalayerlight.rb'
 include Pcap
 
 trap("INT") {
-  puts "Exiting Reactor thread ..."
-  EventMachine.stop
+  
+  if EM.reactor_running? == true
+    puts "Exiting Reactor thread ..."
+    EventMachine.stop
+  end
+  exit
 }
           
 module Tools
@@ -337,7 +341,7 @@ module Thm
             ip_packet << "'#{ipdatadim["ip_ttl"]}',"
             ip_packet << "'#{ipdatadim["ip_ver"]}');"
             if t == 50
-              puts "MSGID: [#{n}] Generated SQL: #{ip_packet}"
+              puts "\e[1;32m\ MSGID:\e[0m\ [#{n}] \e[1;32m\Generated SQL:\e[0m\ #{ip_packet}"
               t = 0
             end
             t = t + 1 unless t == 50
@@ -408,7 +412,7 @@ module Thm
           end
           tcp_packet << "#{tcpdatadim["tcp_off"]}, #{tcpdatadim["tcp_hlen"]}, #{tcpdatadim["tcp_seq"]}, #{tcpdatadim["tcp_sum"]}, #{tcpdatadim["tcp_sport"]}, #{tcpdatadim["tcp_urp"]}, #{tcpdatadim["tcp_win"]});"
           if t == 50
-            puts "MSGID: [#{n}] Generated SQL: #{tcp_packet}"
+            puts "\e[1;32m\ MSGID:\e[0m\ [#{n}] \e[1;32m\Generated SQL:\e[0m\ #{tcp_packet}"
             t = 0
           end
           t = t + 1 unless t == 50
@@ -454,7 +458,7 @@ module Thm
           udp_packet << "'#{udpdatadim["udp_sum"]}',"
           udp_packet << "'#{udpdatadim["udp_sport"]}');"
           if t == 50
-            puts "MSGID: [#{n}] Generated SQL: #{udp_packet}"
+            puts "\e[1;32m\ MSGID:\e[0m\ [#{n}] \e[1;32m\Generated SQL:\e[0m\ #{udp_packet}"
             t = 0
           end
           t = t + 1 unless t == 50
@@ -474,6 +478,23 @@ module Thm
       
     end
   
+    def infinite
+      puts "\e[1;31mStarting Consumer in infinite mode"
+      puts "\e[1;31m==================================\n"
+      puts "NOTE: Only should be used for live captures\n"
+      loop {
+        from_mq_to_db
+      }
+    end
+    
+    def passes(passes)
+      puts "\e[1;31mStarting Consumer for #{passes} passes"
+      puts "\e[1;31m======================================="
+      passes.times {
+        from_mq_to_db
+      }
+    end
+    
   end
 
 end
