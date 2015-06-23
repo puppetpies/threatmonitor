@@ -1,0 +1,38 @@
+Threatmonitor Overview
+======================
+
+
+Sending data to a RabbitMQ queue so you can grab the data later.
+
+Please note that the queue prefix -q the queue will end up named wifi_iptables etc ...
+
+ruby thm-producer.rb -m capture -q wifi
+
+Loading your data into a database.
+
+You can change the queue it reads from / databases tables it loads into in the code just make sure you've created the database tables.
+
+obj = Thm::Consumer.new
+obj.queueprefix = "wifi"
+obj.tblname_ippacket = "wifi_ippacket"
+obj.tblname_tcppacket = "wifi_tcppacket"
+obj.tblname_udppacket = "wifi_udppacket"
+
+ruby thm-consumer.rb
+
+How to load a pcap file.
+
+obj = Thm::Localmachine.new
+obj.tblname_ippacket = "wifi_ippacket"
+obj.tblname_tcppacket = "wifi_tcppacket"
+obj.tblname_udppacket = "wifi_udppacket"
+obj.dbconnect
+
+ruby thm-pcap.rb -f Example2.pcap
+
+Thats really all the is to it.
+
+Enjoy!
+
+Brian Hood
+
