@@ -351,7 +351,7 @@ module Thm
             ip_packet << "'#{ipdatadim["ip_ttl"]}',"
             ip_packet << "'#{ipdatadim["ip_ver"]}');"
             if t == 50
-              puts "\e[1;32m\ DF: #{ip_df} MF: #{ip_mf} MSGID:\e[0m\ [#{n}] \e[1;32m\Generated SQL:\e[0m\ #{ip_packet}"
+              puts "\e[1;32m\ MSGID:\e[0m\ [#{n}] \e[1;32m\Generated SQL:\e[0m\ #{ip_packet}"
               t = 0
             end
             t = t + 1 unless t == 50
