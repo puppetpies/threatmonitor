@@ -106,11 +106,14 @@ module Thm
   
   class Producer < DataServices
     
-    def from_pcap_to_mq(interface, pcapfilters)
+    def from_pcap_to_mq(interface, pcapfilters="")
       # TODO
       trace = Pcaplet.new("-n -i #{interface}")
-      filter1 = Pcap::Filter.new("#{pcapfilters}", trace.capture)
-      trace.add_filter(filter1)
+      if pcapfilters != ""
+        filter1 = Pcap::Filter.new("#{pcapfilters}", trace.capture)
+        trace.add_filter(filter1)
+        puts "Using Filter: #{pcapfilters}"
+      end
       puts "Packet capture in progress press CTRL+C to exit ..."
       trace.each_packet { |pkt|
         guid = Tools::guid # IP / TCP / UDP relationship
