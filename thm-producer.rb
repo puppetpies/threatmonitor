@@ -16,7 +16,9 @@ ARGV[0] = "--help" if ARGV[0] == nil
 opts = GetoptLong.new(
   [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
   [ '--mode', '-m', GetoptLong::REQUIRED_ARGUMENT ],
-  [ '--queueprefix', '-q', GetoptLong::REQUIRED_ARGUMENT ]
+  [ '--queueprefix', '-q', GetoptLong::REQUIRED_ARGUMENT ],
+  [ '--interface', '-i', GetoptLong::REQUIRED_ARGUMENT ],
+  [ '--filter', '-f', GetoptLong::REQUIRED_ARGUMENT ]
 )
 
 banner = "\e[1;34mWelcome to Threatmonitor Producer \e[0m\ \n"
@@ -32,6 +34,10 @@ opts.each do |opt, arg|
 -m, --mode database / capture [ REQUIRED ]
   
 -q, --queueprefix queue name [ REQUIRED ]
+
+-i --interface network interface [ REQUIRED ]
+ 
+-f --filter your pcap / tcpdump style filter [ OPTIONAL ]
     ]
       puts banner
       puts helper
@@ -40,6 +46,10 @@ opts.each do |opt, arg|
       @modeparam = arg
     when '--queueprefix'
       @queueprefix = arg
+    when '--interface'
+      @interface = arg
+    when '--filter'
+      @filter = arg
   end
 end
 
@@ -65,7 +75,7 @@ elsif mode == "capture"
     puts "Require superuser privileges"
     exit
   end
-  obj.from_pcap_to_mq("wlp3s0", "tcp port not 22")
+  obj.from_pcap_to_mq("#{@interface}", "#{@filter}")
   #obj.from_pcap_to_mq("wlo1", "tcp port not 22")
   obj.mqclose
 end
