@@ -3,6 +3,7 @@ CREATE USER "threatmonitor" WITH PASSWORD 'dk3rbi9l' NAME 'Threatmonitor' SCHEMA
 CREATE SCHEMA "threatmonitor" AUTHORIZATION "threatmonitor";
 ALTER USER "threatmonitor" SET SCHEMA "threatmonitor";
 
+DROP TABLE "threatmonitor".ippacket;
 CREATE TABLE "threatmonitor".ippacket (
   "guid" char(36) not null primary key,
   "recv_date" string,
@@ -21,7 +22,7 @@ CREATE TABLE "threatmonitor".ippacket (
   "ip_ver" int not null 
 );
 
-
+DROP TABLE "threatmonitor".tcppacket;
 CREATE TABLE "threatmonitor".tcppacket (
   "guid" char(36) NOT NULL primary key,
   "recv_date" string,
@@ -42,7 +43,7 @@ CREATE TABLE "threatmonitor".tcppacket (
   "tcp_win" int DEFAULT NULL
 );
 
-
+DROP TABLE "threatmonitor".udppacket;
 CREATE TABLE "threatmonitor".udppacket (
   "guid" char(36) NOT NULL primary key,
   "recv_date" string,
@@ -54,7 +55,7 @@ CREATE TABLE "threatmonitor".udppacket (
 
 
 # Wifi
-
+DROP TABLE "threatmonitor".wifi_ippacket;
 CREATE TABLE "threatmonitor".wifi_ippacket (
   "guid" char(36) not null primary key,
   "recv_date" string,
@@ -94,7 +95,7 @@ CREATE TABLE "threatmonitor".wifi_tcppacket (
   "tcp_win" int DEFAULT NULL
 );
 
-
+DROP TABLE "threatmonitor".wifi_udppacket;
 CREATE TABLE "threatmonitor".wifi_udppacket (
   "guid" char(36) NOT NULL primary key,
   "recv_date" string,
@@ -114,7 +115,7 @@ CREATE TABLE "threatmonitor".wifi_udppacket (
 #COPY INTO threatmonitor.udppacket from '/tmp/udppacket.csv' USING DELIMITERS '|','\n', '"';
 
 
-INSERT INTO "threatmonitor".wifi_tcppacket 
-(guid, recv_date, tcp_data_len, tcp_dport, tcp_ack, tcp_fin, tcp_syn, tcp_rst, tcp_psh, tcp_urg, tcp_off, tcp_hlen, tcp_seq, tcp_sum, tcp_sport, tcp_urp, tcp_win) 
-VALUES ('a6cd6b9f-53cf-a1db-f4f5-644e118394f0','2015-06-20 14:46:33 +0100', '1448','51213','N','N','N','N','N','N','8', '8', '3248172952', '55697', '80', '0', '239');
+#INSERT INTO "threatmonitor".wifi_tcppacket 
+#(guid, recv_date, tcp_data_len, tcp_dport, tcp_ack, tcp_fin, tcp_syn, tcp_rst, tcp_psh, tcp_urg, tcp_off, tcp_hlen, tcp_seq, tcp_sum, tcp_sport, tcp_urp, tcp_win) 
+#VALUES ('a6cd6b9f-53cf-a1db-f4f5-644e118394f0','2015-06-20 14:46:33 +0100', '1448','51213','N','N','N','N','N','N','8', '8', '3248172952', '55697', '80', '0', '239');
 
