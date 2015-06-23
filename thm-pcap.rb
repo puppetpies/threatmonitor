@@ -42,11 +42,9 @@ end
 puts banner
 # See thmmq.rb for list for variables
 obj = Thm::Localmachine.new
-obj.queueprefix = "wifi"
 obj.tblname_ippacket = "wifi_ippacket"
 obj.tblname_tcppacket = "wifi_tcppacket"
 obj.tblname_udppacket = "wifi_udppacket"
-#obj.mqconnect
 obj.dbconnect
 # Send data to database from queue
 if @pcapfile.nil? == false
