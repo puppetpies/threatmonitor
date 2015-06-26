@@ -42,6 +42,8 @@ end
 puts banner
 # See thmmq.rb for list for variables
 obj = Thm::Localmachine.new
+obj.datastore = "mysql"
+obj.dbhost = "localhost"
 obj.tblname_ippacket = "wifi_ippacket"
 obj.tblname_tcppacket = "wifi_tcppacket"
 obj.tblname_udppacket = "wifi_udppacket"
