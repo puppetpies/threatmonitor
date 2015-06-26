@@ -19,7 +19,8 @@ banner << "\e[1;34m=================================\e[0m\ \n"
 opts = GetoptLong.new(
   [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
   [ '--infinite', '-i', GetoptLong::NO_ARGUMENT ],
-  [ '--passes', '-p', GetoptLong::REQUIRED_ARGUMENT ]
+  [ '--passes', '-p', GetoptLong::REQUIRED_ARGUMENT ],
+  [ '--runonce', '-r', GetoptLong::NO_ARGUMENT ]
 )
 
 opts.each do |opt, arg|
@@ -32,6 +33,8 @@ opts.each do |opt, arg|
 -i, --infinite [ For consuming live captures ]
   
 -p, --passes number of passes  [ For medium / larger queues ]
+
+-r, --runonce [ Just as it says ]
 
 NOTES:
 
@@ -46,6 +49,8 @@ NOTES:
       @infinite = arg
     when '--passes'
       @passes = arg
+    when '--runonce'
+      @runonce = arg
   end
 end
 
@@ -65,7 +70,7 @@ if @infinite.nil? == false
   obj.infinite
 elsif @passes.nil? == false
   obj.passes(@passes.to_i)
-else
+elsif @runonce.nil? == false
   obj.from_mq_to_db
 end
 obj.mqclose
