@@ -56,6 +56,8 @@ end
 puts banner
 # See thmmq.rb for list for variables
 obj = Thm::Producer.new
+obj.datastore = "mysql"
+obj.dbhost = "localhost"
 obj.queueprefix = @queueprefix
 obj.mqconnect
 obj.dbconnect unless @modeparam == "capture"
