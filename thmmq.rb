@@ -9,7 +9,6 @@
 ########################################################################
 
 require 'rubygems'
-require 'MonetDB'
 require 'amqp'
 require 'bunny'
 require 'eventmachine'
@@ -58,9 +57,10 @@ module Thm
     #  obj.mqconnect
     #  obj.dbconnect
     
-    attr_accessor :mqhost, :mquser, :mqpass, :mqvhost, :dbhost, :dbuser, :dbname, :queueprefix, :tblname_ippacket, :tblname_tcppacket, :tblname_udppacket
+    attr_accessor :datastore, :mqhost, :mquser, :mqpass, :mqvhost, :dbhost, :dbuser, :dbpass, :dbname, :queueprefix, :tblname_ippacket, :tblname_tcppacket, :tblname_udppacket
     
     def initialize
+      @datastore = "monetdb"
       @mqhost = "127.0.0.1"
       @mquser = "traffic"
       @mqpass = "dk3rbi9l"
@@ -87,7 +87,13 @@ module Thm
     end
     
     def dbconnect
-      @conn = DatalayerLight.new
+      if @datastore == "mysql"
+        @conn = DatalayerLight::MySQLDrv.new
+        puts "Using MySQL Datasource"
+      elsif @datastore == "monetdb"
+        @conn = DatalayerLight::MonetDBDrv.new
+        puts "Using MonetDB Datasource"
+      end
       @conn.hostname = @dbhost
       @conn.username = @dbuser
       @conn.password = @dbpass
@@ -219,12 +225,12 @@ module Thm
           @ch.default_exchange.publish("#{pcktyaml}", :routing_key => q.name)
           # TCP Packet
           #puts "Process TCP Data"
-          tcppacketsqlcount = "SELECT COUNT(*) as num FROM \"threatmonitor\".#{@tblname_tcppacket} WHERE guid = '#{guid}'"
+          tcppacketsqlcount = "SELECT COUNT(*) as num FROM #{@tblname_tcppacket} WHERE guid = '#{guid}'"
           res2count = @conn.query("#{tcppacketsqlcount}")
           row2count = res2count.fetch_hash
           tcpcount = row2count["num"]
           #puts "TCP Record Count: #{tcpcount}" if tcpcount.to_i > 0
-          tcppacketsql = "SELECT * FROM \"threatmonitor\".tcppacket WHERE guid = '#{guid}'"
+          tcppacketsql = "SELECT * FROM #{@tblname_tcppacket} WHERE guid = '#{guid}'"
           res2 = @conn.query("#{tcppacketsql}")
           while row2 = res2.fetch_hash do
             if s == 100
@@ -258,12 +264,12 @@ module Thm
             end
             # UDP Packet
             #puts "Process UDP Data"
-            udppacketsqlcount = "SELECT COUNT(*) as num FROM \"threatmonitor\".#{@tblname_udppacket} WHERE guid = '#{guid}'"
+            udppacketsqlcount = "SELECT COUNT(*) as num FROM #{@tblname_udppacket} WHERE guid = '#{guid}'"
             res3count = @conn.query("#{udppacketsqlcount}")
             row3count = res3count.fetch_hash
             udpcount = row3count["num"]
             #puts "UDP Record Count: #{udpcount}" if udpcount.to_i > 0
-            udppacketsql = "SELECT * FROM \"threatmonitor\".#{@tblname_udppacket} WHERE guid = '#{guid}'"
+            udppacketsql = "SELECT * FROM #{@tblname_udppacket} WHERE guid = '#{guid}'"
             res3 = @conn.query("#{udppacketsql}")
             while row3 = res3.fetch_hash do
               if v == 100
@@ -322,7 +328,7 @@ module Thm
             #puts "MSGID: [#{n}] Received #{body}"
             ipdata = YAML.load(body).to_a
             ipdatadim = ipdata[0][1]
-            ip_packet = "INSERT INTO \"#@dbname\".#{@tblname_ippacket} "
+            ip_packet = "INSERT INTO #{@tblname_ippacket} "
             ip_packet << "(guid, recv_date, ip_df, ip_dst, ip_hlen, ip_id, ip_len, ip_mf, ip_off, ip_proto, ip_src, ip_sum, ip_tos, ip_ttl, ip_ver) "
             ip_packet << "VALUES ("
             ip_packet << "'#{ipdatadim["guid"]}',"
@@ -382,7 +388,7 @@ module Thm
           #puts "MSGID: [#{n}] Received #{body}"
           tcpdata = YAML.load(body).to_a
           tcpdatadim = tcpdata[0][1]
-          tcp_packet = "INSERT INTO \"#@dbname\".#{@tblname_tcppacket} "
+          tcp_packet = "INSERT INTO #{@tblname_tcppacket} "
           tcp_packet << "(guid, recv_date, tcp_data_len, tcp_dport, tcp_ack, tcp_fin, tcp_syn, tcp_rst, tcp_psh, tcp_urg, tcp_off, tcp_hlen, tcp_seq, tcp_sum, tcp_sport, tcp_urp, "
           tcp_packet << "tcp_win) "
           tcp_packet << "VALUES ("
@@ -459,7 +465,7 @@ module Thm
           #puts "MSGID: [#{n}] Received #{body}"
           udpdata = YAML.load(body).to_a
           udpdatadim = udpdata[0][1]
-          udp_packet = "INSERT INTO \"#@dbname\".#{@tblname_udppacket} "
+          udp_packet = "INSERT INTO #{@tblname_udppacket} "
           udp_packet << "(guid,"
           udp_packet << "recv_date,"
           udp_packet << "udp_dport,"
@@ -526,7 +532,7 @@ module Thm
         dtime = Time.now
         # IP Packet
         if pkt.ip?
-            ip_packet = "INSERT INTO \"#@dbname\".#{@tblname_ippacket} "
+            ip_packet = "INSERT INTO #{@tblname_ippacket} "
             ip_packet << "(guid, recv_date, ip_df, ip_dst, ip_hlen, ip_id, ip_len, ip_mf, ip_off, ip_proto, ip_src, ip_sum, ip_tos, ip_ttl, ip_ver) "
             ip_packet << "VALUES ("
             ip_packet << "'#{guid}',"
@@ -563,7 +569,7 @@ module Thm
         end
         # TCP Packet
         if pkt.tcp?
-          tcp_packet = "INSERT INTO \"#@dbname\".#{@tblname_tcppacket} "
+          tcp_packet = "INSERT INTO #{@tblname_tcppacket} "
           tcp_packet << "(guid, recv_date, tcp_data_len, tcp_dport, tcp_ack, tcp_fin, tcp_syn, tcp_rst, tcp_psh, tcp_urg, tcp_off, tcp_hlen, tcp_seq, tcp_sum, tcp_sport, tcp_urp, "
           tcp_packet << "tcp_win) "
           tcp_packet << "VALUES ("
@@ -613,7 +619,7 @@ module Thm
         end
         # UDP Packet
         if pkt.udp?
-          udp_packet = "INSERT INTO \"#@dbname\".#{@tblname_udppacket} "
+          udp_packet = "INSERT INTO #{@tblname_udppacket} "
           udp_packet << "(guid,"
           udp_packet << "recv_date,"
           udp_packet << "udp_dport,"
