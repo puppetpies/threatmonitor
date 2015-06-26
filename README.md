@@ -1,10 +1,10 @@
-Threatmonitor - Packet Analysis suite  with MonetDB / RabbitMQ & PCap integration
+Threatmonitor - Packet Analysis suite  with MonetDB / MySQL - RabbitMQ & PCap integration
 
 Things you need
 
 RabbitMQ
 
-MonetDB
+MonetDB or MySQL
 
 Ruby
 
@@ -17,7 +17,7 @@ You'll need PCAP / Development Header files
 gem build pcap.gemspec
 gem install pcap-0.7.7.gem 
 
-GEMS: AMQP, Bunny, Eventmachine, guid, MonetDB, pcaplet
+GEMS: AMQP, Bunny, Eventmachine, guid, MonetDB, mysql, pcaplet
 
 This is all experimental but i believe it works well so far.
 
@@ -42,5 +42,7 @@ monetdb release threatmonitor
 monetdb start threatmonitor
 
 Import the schema from the SQL provided
- 
+
+I've now included MySQL Database support also however if your going to create big data sets i think i would use MonetDB
+
 Have fun !
