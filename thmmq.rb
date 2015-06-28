@@ -15,6 +15,7 @@ require 'eventmachine'
 require 'guid'
 require 'yaml'
 require 'pcaplet'
+require 'pcaprub' # For Live capture / write
 require './datalayerlight.rb'
 include Pcap
 
@@ -523,6 +524,24 @@ module Thm
   
   class Localmachine < DataServices
   
+    def from_pcap_to_disk(interface, dumpfile)
+      puts "Capturing Live data... "
+      begin
+      capture = PCAPRUB::Pcap.open_live("#{interface}", 65535, true, 0)
+      puts "Writing to file ..."
+      puts "Press CTRL+C to exit ..."
+      dumper = capture.dump_open("#{dumpfile}")
+      capture_packets = 100
+      capture.each {|pkt|
+        capture.dump(pkt.length, pkt.length, pkt)
+      }
+      capture.dump_close
+      rescue
+        puts "Make sure the interface name is correct and you have enough disk space"
+        exit
+      end      
+    end
+    
     def from_pcap_db(pcapfile)
       t, n, s, v, x, z = 0, 0, 0, 0, 0, 0
       ipcount, tcpcount, udpcount = 0, 0, 0
