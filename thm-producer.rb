@@ -57,7 +57,10 @@ puts banner
 # See thmmq.rb for list for variables
 obj = Thm::Producer.new
 obj.datastore = "mysql"
-obj.dbhost = "localhost"
+obj.dbhost = "172.17.0.1"
+obj.dbuser = "threatmonitor"
+obj.dbpass = "dk3rbi9L"
+obj.dbname = "threatmonitor"
 obj.queueprefix = @queueprefix
 obj.mqconnect
 obj.dbconnect unless @modeparam == "capture"
@@ -77,7 +80,7 @@ elsif mode == "capture"
     puts "Require superuser privileges"
     exit
   end
-  obj.from_pcap_to_mq("#{@interface}", "#{@filter}")
+  obj.from_interface_to_mq("#{@interface}", "#{@filter}")
   #obj.from_pcap_to_mq("wlo1", "tcp port not 22")
   obj.mqclose
 end
