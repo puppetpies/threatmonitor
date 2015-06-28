@@ -112,10 +112,12 @@ module Thm
     end
 
   end
+
+  # Send data else were
   
   class Producer < DataServices
     
-    def from_pcap_to_mq(interface, pcapfilters="")
+    def from_interface_to_mq(interface, pcapfilters="")
       # TODO
       trace = Pcaplet.new("-n -i #{interface}")
       if pcapfilters != ""
