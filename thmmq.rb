@@ -49,6 +49,8 @@ module Thm
 
   class DataServices
 
+    #  This class provides all the core functionality to the lower level DatalayerLight
+    #
     #  Example variables
     #
     #  obj = Thm::Producer.new
