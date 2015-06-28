@@ -528,6 +528,8 @@ module Thm
   
   class Localmachine < DataServices
   
+    # We have to use a different Gem here called pcaprub that supports live interface / dumping mode.
+    
     def from_pcap_to_disk(interface, dumpfile)
       puts "Capturing Live data... "
       begin
@@ -545,6 +547,15 @@ module Thm
         exit
       end      
     end
+    
+    # We can inject packets into an interface DANGEROUS !!!
+    
+    def from_pcap_to_interface_injection(interface, inputdumpfile)
+      # NOTES
+      # Src / Dst rewriting ip_src, ip_dst
+    end
+    
+    # From Pcap file to Datastore
     
     def from_pcap_db(pcapfile)
       t, n, s, v, x, z = 0, 0, 0, 0, 0, 0
