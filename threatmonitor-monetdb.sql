@@ -106,6 +106,31 @@ CREATE TABLE "threatmonitor".wifi_udppacket (
 );
 
 
+
+CREATE TABLE "threatmonitor".groups (
+gid INT GENERATED ALWAYS AS 
+        IDENTITY (
+           START WITH 100 INCREMENT BY 1
+           NO MINVALUE NO MAXVALUE
+           CACHE 2 CYCLE
+) primary key,
+  groupname varchar(100) not null
+);
+
+CREATE TABLE "threatmonitor".users (
+uid INT GENERATED ALWAYS AS 
+        IDENTITY (
+           START WITH 100 INCREMENT BY 1
+           NO MINVALUE NO MAXVALUE
+           CACHE 2 CYCLE
+) primary key,
+  username varchar(100) not null,
+  password varchar(512),
+  gid int not null,
+  FOREIGN KEY (gid) REFERENCES "threatmonitor".groups (gid)
+);
+
+
 # Query not working due lack of aggregate function
 
 #select "ip_dst", "tcp_sport", "tcp_dport", count("ip_dst") as num from tcppacket sel LEFT JOIN ippacket sel2 ON (sel2.guid = sel.guid) GROUP by "ip_dst";
