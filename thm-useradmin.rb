@@ -4,86 +4,68 @@
 #
 # Description: Threatmonitor User Administration
 # 
-# The use of Singletons is mainly for Data Security 
+# Extends the functionality of the Thm module adding Authorization
+# Adding User / Group Privileges functionality
 #
 ########################################################################
 
+
 require 'getoptlong'
 require 'readline'
-require 'digest'
-require './thmmq.rb'
 require 'io/console'
+require './thm-privileges.rb'
 
-module Thm::Privileges
+trap("INT") {
+  puts "\nSee you soon !"
+  exit
+}
 
-  module Datastore
-    obj2 = Thm::Localmachine.new
-    obj2.datastore = "monetdb"
-    obj2.dbconnect
-  end
-  
-  class Users
-    
-    include Datastore
-    
-    class << self
-    
-      puts "\e[1;33m\Threatmonitor - User Administration\e[0m\ "
-      puts "\e[1;33m\===================================\e[0m\ \n\n"
-      
-      puts "\e[1;31m\ Create User \e[0m\ \n\n"
-      
-      def mkhash(payload)
-        hash = Digest::SHA512.new
-        hash.update("#{payload}")
-        puts "Password Omitted !"
+obj = Thm::Authorization::Privileges.new
+obj.datastore = "monetdb"
+obj.dbconnect
+if obj.user_exists?("admin") == true
+  # Menu
+  while buf = Readline.readline("\e[1;32m\Threatmonitor>\e[0m\ ", true)
+    begin
+      puts "\n"
+      puts "\e[1;38m|   User Administration    |\e[0m\ \n"
+      puts "\e[1;38m\\==========================/\e[0m\ "
+      puts "\n"
+      puts "\e[1;36m1)\e[0m\ Add User"
+      puts "\e[1;36m2)\e[0m\ Delete User"
+      puts "\e[1;36m3)\e[0m\ Add Group"
+      puts "\e[1;36m4)\e[0m\ Delete Group"
+      puts "\e[1;36m5)\e[0m\ List Users"
+      puts "\e[1;36m6)\e[0m\ List Groups"
+      puts ""
+      puts "q: Exit Threatmonitor Suite\n"
+      puts "\n"
+      case buf
+      when "1"
+        obj.add_user
+      when "2"
+        obj.delete_user
+      when "3"
+        obj.add_group
+      when "4"
+        obj.delete_group
+      when "5"
+        obj.list_users
+      when "6"
+        obj.list_groups
+      when "q"
+        puts "\nSee you soon !"
+        exit
       end
-
-      def add_user
-        while buf = Readline.readline("\e[1;36m\Username: \e[0m\ ", true)
-          username = buf
-          break                
-        end
-      end
-      
-      def get_password(prompt="\e[1;36m\Password: \e[0m\ ")
-        print prompt
-        plain = STDIN.noecho(&:gets).chomp
-        password = mkhash(plain)
-      end
-
+    rescue NoMethodError
     end
-
-  end
-  
-  class Groups
-  
-    include Datastore
-    
-    class << self
-    
-      def group_exist?(name)
-
-        if val == 0
-          false
-        else
-          true
-        end
-      end
-      
-      def create_group(name)
-      
-      end
-      alias_method :remove_group, :create_group
-    end
-    
-  end
-  
+  end  
+else
+  # Create admin user if none exists
+  #obj.add_user
+  #obj.delete_user
+  #obj.set_password
 end
-
-obj = Thm::Privileges
-obj::Users::add_user
-obj::Users::get_password
 
 
 
