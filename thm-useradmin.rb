@@ -43,6 +43,7 @@ if obj.user_exists?("admin") == true
       case buf
       when "1"
         obj.add_user
+        obj.set_password
       when "2"
         obj.delete_user
       when "3"

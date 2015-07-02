@@ -133,7 +133,7 @@ module Thm::Authorization
           end          
         end
       when "addgroup"
-        sqlidcnt = "SELECT count(*) as num FROM groups WHERE groupname = '#{actiontemplate["userdata"]["group"]}';"
+        sqlidcnt = "SELECT count(*) as num FROM groups WHERE groupname = '#{name}';"
         resgidcnt = @conn.query("#{sqlidcnt}")
         rowgidcnt = resgidcnt.fetch_hash
         puts "#{rowgidcnt["num"].to_i}"
