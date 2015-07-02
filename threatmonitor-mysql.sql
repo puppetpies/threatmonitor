@@ -133,6 +133,22 @@ CREATE TABLE `wifi_udppacket` (
   PRIMARY KEY (`guid`)
 ) ENGINE=INNODB DEFAULT CHARSET=latin1;
 
+
+CREATE TABLE groups (
+  gid INT NOT NULL AUTO_INCREMENT,
+  groupname VARCHAR(100) NOT NULL,
+  PRIMARY KEY (gid)
+);
+
+CREATE TABLE users (
+  uid INT NOT NULL AUTO_INCREMENT,
+  username VARCHAR(100) NOT NULL,
+  password VARCHAR(512),
+  gid int not null,
+  FOREIGN KEY (gid) REFERENCES groups (gid),
+  PRIMARY KEY (uid)
+);
+
 -- CHANGE MASTER TO MASTER_HOST=’dev-vnc-01′,
 -- MASTER_PORT=3306,
 -- MASTER_USER=’orinoco’,
