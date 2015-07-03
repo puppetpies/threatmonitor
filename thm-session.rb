@@ -69,8 +69,8 @@ module ThmUI extend self
       yield self if block_given?
     end
 
-    def login_status?
-      if @sessobj.login_status? == false
+    def login_session?
+      if @sessobj.login_session? == false
         puts "Not logged in"
       else
         return true
@@ -78,13 +78,12 @@ module ThmUI extend self
     end
     
     def get_session_info?
-      @thmsession = @sessobj.thmsession
-      puts "Sinatra: #{Sinatra::VERSION} / Session Secret: #{self.session_secret} / Thmsession: #{@thmsession}"
+      puts "Sinatra: #{Sinatra::VERSION} / Thmsession: #{@sessobj.thmsession}"
     end
     
     def login(username, password)
       @sessobj.login("#{username}", "#{password}")
-      if login_status?
+      if login_session?
         puts "\e[1;32m\Welcome to Threatmonitor \e[0m\ "
         puts "Thm Session: #{@sessobj.thmsession}"
         return true
@@ -95,8 +94,13 @@ module ThmUI extend self
      
     def logout
       @sessobj.thmsesslock = "DEADBEEF"
-      #@sessobj.logout
-      #@sessobj.dbclose
+    end
+    
+    def login_lock?
+      if @sessobj.thmsesslock != "OK"
+        puts "Session doesn't exist redirecting to Login..."
+        redirect '/'
+      end
     end
     
     # Sinatra routings
@@ -113,14 +117,17 @@ module ThmUI extend self
     end
     
     getpost '/dashboard' do
-      if @sessobj.thmsesslock != "OK"
-        puts "Session doesn't exist redirecting to Login..."
-        redirect '/'
-      end
+      login_lock?
       slim :dashboard
     end
     
+    get '/status' do
+      # Informational / Debug
+      get_session_info?
+    end
+    
     getpost '/logout' do
+      # Logout and remove thmsesslock
       if @sessobj.thmsesslock == "OK"
         logout
         redirect '/'
@@ -136,5 +143,7 @@ module ThmUI extend self
   end
   
 end
+
+# Start Dashboard Release
 
 Deedrah.new

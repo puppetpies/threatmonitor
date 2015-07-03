@@ -42,7 +42,7 @@ module Thm::Authorization
       end
     end
     
-    def login_status?
+    def login_session?
       if @thmsession != "failure" or @thmsession != nil
         return true
       else
@@ -52,6 +52,7 @@ module Thm::Authorization
     
     def logout
       @thmsession = nil
+      @thmsesslock = "DEADBEEF"
     end
     
   end
