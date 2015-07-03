@@ -9,6 +9,7 @@
 #
 ########################################################################
 
+require './thmmq.rb'
 require './thm-privileges.rb'
 
 module Thm::Authorization
@@ -17,19 +18,25 @@ module Thm::Authorization
     
     attr_reader :thmsession
     
+    def initialize
+      super
+      @debug = 1
+      @thmsession = nil
+    end
+    
     def login(username, password)
       obj = Thm::Authorization::Privileges.new
       pwhash = obj.mkhash(password)
-      sqlusrcnt = "SELECT count(*) as num FROM users WHERE username = '#{username}' and password '#{pwhash}';"
+      sqlusrcnt = "SELECT count(*) as num FROM users WHERE username = '#{username}' AND password = '#{pwhash}'"
       resusrcnt = @conn.query("#{sqlusrcnt}")
       rowusrcnt = resusrcnt.fetch_hash
       puts "#{rowusrcnt["num"].to_i}"
       if rowusrcnt["num"].to_i == 1
         puts "Authentication Success"
-        @thmsession = Tools::guid
+        @thmsession = Tools::guid.to_s
       else
         @thmsession = "failure"
-        puts "Failure to Authenticate"
+        puts "\e[1;31m\Failure to Authenticate \e[0m\ "
       end
     end
     
