@@ -37,6 +37,6 @@ id INT GENERATED ALWAYS AS
 );
 
 COPY 169357 OFFSET 1 RECORDS INTO "geoipdata".ipv4blocks FROM '/data2/MaxMind/GeoLite2-Country-Blocks-IPv4.csv' USING DELIMITERS ',','\n','';
-COPY 250 OFFSET 1 RECORDS INTO "geoipdata". FROM '/data2/MaxMind/GeoLite2-Country-CSV_20150602/en.csv' USING DELIMITERS ',','\n','';
+COPY 250 OFFSET 1 RECORDS INTO "geoipdata".locations FROM '/data2/MaxMind/GeoLite2-Country-CSV_20150602/en.csv' USING DELIMITERS ',','\n','';
 
 
