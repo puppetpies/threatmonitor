@@ -17,11 +17,11 @@ module Thm::Authorization
   class Authentication < Thm::DataServices
     
     attr_reader :thmsession
+    attr_accessor :thmsesslock
     
     def initialize
       super
       @debug = 1
-      @thmsession = nil
     end
     
     def login(username, password)
@@ -34,8 +34,10 @@ module Thm::Authorization
       if rowusrcnt["num"].to_i == 1
         puts "Authentication Success"
         @thmsession = Tools::guid.to_s
+        @thmsesslock = "OK"
       else
         @thmsession = "failure"
+        @thmsesslock = "FAILURE"
         puts "\e[1;31m\Failure to Authenticate \e[0m\ "
       end
     end
