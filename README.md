@@ -9,6 +9,7 @@ MonetDB or MySQL
 Ruby
 
 Pcaplet - https://github.com/ahobson/ruby-pcap
+PCAPRUB - https://github.com/puppetpies/pcaprub - For Interface Realtime capture / dumping to disk
 
 To build:
 
