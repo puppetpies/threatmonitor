@@ -32,7 +32,11 @@ id INT GENERATED ALWAYS AS
   continent_code char(2),
   continent_name char(15),
   country_iso_code char(2),
-  country_name char(50),
-  FOREIGN KEY (geoname_id) REFERENCES "geoipdata".ipv4blocks (geoname_id)
+  country_name char(50)
+-- FOREIGN KEY (geoname_id) REFERENCES "geoipdata".ipv4blocks (geoname_id)
 );
+
+COPY 169357 OFFSET 1 RECORDS INTO "geoipdata".ipv4blocks FROM '/data2/MaxMind/GeoLite2-Country-Blocks-IPv4.csv' USING DELIMITERS ',','\n','';
+COPY 250 OFFSET 1 RECORDS INTO "geoipdata". FROM '/data2/MaxMind/GeoLite2-Country-CSV_20150602/en.csv' USING DELIMITERS ',','\n','';
+
 
