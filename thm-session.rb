@@ -138,6 +138,11 @@ module ThmUI extend self
     get '/stylesheets/screen.css' do
       send_file 'stylesheets/screen.css', :type => :css
     end
+    
+    get '/js/chartkick.js' do
+      send_file 'js/chartkick.js', :type => :js
+    end
+    
     run!
     
   end
