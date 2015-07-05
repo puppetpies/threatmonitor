@@ -24,6 +24,7 @@ Gem::Specification.new do |spec|
     "thm-session.rb",
     "thm-useradmin.rb",
     "thm-pcap.rb",
+    "service_definitions.csv"
     "lib/thmmq.rb",
     "js/jquery.min.js",
     "js/chartkick.js",
