@@ -74,6 +74,10 @@ CREATE TABLE "threatmonitor".wifi_ippacket (
   "ip_ver" int not null 
 );
 
+CREATE INDEX index_guid_wifiip ON "threatmonitor".wifi_ippacket(guid);
+CREATE INDEX index_ip_dst_wifiip ON "threatmonitor".wifi_ippacket(ip_dst);
+CREATE INDEX index_ip_src_wifiip ON "threatmonitor".wifi_ippacket(ip_src);
+
 DROP TABLE "threatmonitor".wifi_tcppacket;
 CREATE TABLE "threatmonitor".wifi_tcppacket (
   "guid" char(36) NOT NULL primary key,
@@ -94,6 +98,10 @@ CREATE TABLE "threatmonitor".wifi_tcppacket (
   "tcp_urp" char(10) DEFAULT NULL,
   "tcp_win" int DEFAULT NULL
 );
+CREATE INDEX index_guid_wifitcp ON "threatmonitor".wifi_tcppacket(guid);
+CREATE INDEX index_tcp_dport_wifitcp ON "threatmonitor".wifi_tcppacket(tcp_dport);
+CREATE INDEX index_tcp_sport_wifitcp ON "threatmonitor".wifi_tcppacket(tcp_sport);
+
 
 DROP TABLE "threatmonitor".wifi_udppacket;
 CREATE TABLE "threatmonitor".wifi_udppacket (
@@ -105,7 +113,9 @@ CREATE TABLE "threatmonitor".wifi_udppacket (
   "udp_sport" int DEFAULT NULL
 );
 
-
+CREATE INDEX index_guid_wifiudp ON "threatmonitor".wifi_udppacket(guid);
+CREATE INDEX index_udp_dport_wifiudp ON "threatmonitor".wifi_udppacket(udp_dport);
+CREATE INDEX index_udp_sport_wifiudp ON "threatmonitor".wifi_udppacket(udp_sport);
 
 CREATE TABLE "threatmonitor".groups (
 gid INT GENERATED ALWAYS AS 
@@ -130,15 +140,24 @@ uid INT GENERATED ALWAYS AS
   FOREIGN KEY (gid) REFERENCES "threatmonitor".groups (gid)
 );
 
+CREATE TABLE "threatmonitor".service_definitions (
+  protocol char(5),
+  num int not null,
+  description char(30)
+);
 
 # Query not working due lack of aggregate function
 
 #select "ip_dst", "tcp_sport", "tcp_dport", count("ip_dst") as num from tcppacket sel LEFT JOIN ippacket sel2 ON (sel2.guid = sel.guid) GROUP by "ip_dst";
 
+# Service / Ports / IP
+select * from wifi_ippacket a JOIN wifi_udppacket b on (a.guid = b.guid) JOIN service_definitions s on (s.num = b.udp_dport) where udp_dport > 0 and udp_dport < 10000 and s.protocol = 'UDP' group by b.udp_dport, a.ip_dst, s.description;
+
 #COPY INTO threatmonitor.ippacket from '/tmp/ippacket.csv' USING DELIMITERS '|','\n', '"';
 #COPY INTO threatmonitor.tcppacket from '/tmp/tcppacket.csv' USING DELIMITERS '|','\n', '"';
 #COPY INTO threatmonitor.udppacket from '/tmp/udppacket.csv' USING DELIMITERS '|','\n', '"';
 
+COPY INTO "threatmonitor".service_definitions FROM '/home/brian/Projects/ThreatmonitorDashboard/tcpudpportslist.csv' DELIMITERS ',';
 
 #INSERT INTO "threatmonitor".wifi_tcppacket 
 #(guid, recv_date, tcp_data_len, tcp_dport, tcp_ack, tcp_fin, tcp_syn, tcp_rst, tcp_psh, tcp_urg, tcp_off, tcp_hlen, tcp_seq, tcp_sum, tcp_sport, tcp_urp, tcp_win) 
