@@ -21,6 +21,9 @@ CREATE TABLE "threatmonitor".ippacket (
   "ip_ttl" int not null,
   "ip_ver" int not null 
 );
+CREATE INDEX index_guid_defaultip ON "threatmonitor".ippacket(guid);
+CREATE INDEX index_ip_dst_defaultip ON "threatmonitor".ippacket(ip_dst);
+CREATE INDEX index_ip_src_defaultip ON "threatmonitor".ippacket(ip_src);
 
 DROP TABLE "threatmonitor".tcppacket;
 CREATE TABLE "threatmonitor".tcppacket (
@@ -42,6 +45,10 @@ CREATE TABLE "threatmonitor".tcppacket (
   "tcp_urp" char(10) DEFAULT NULL,
   "tcp_win" int DEFAULT NULL
 );
+CREATE INDEX index_guid_defaulttcp ON "threatmonitor".tcppacket(guid);
+CREATE INDEX index_tcp_dport_defaulttcp ON "threatmonitor".tcppacket(tcp_dport);
+CREATE INDEX index_tcp_sport_defaulttcp ON "threatmonitor".tcppacket(tcp_sport);
+
 
 DROP TABLE "threatmonitor".udppacket;
 CREATE TABLE "threatmonitor".udppacket (
@@ -52,7 +59,9 @@ CREATE TABLE "threatmonitor".udppacket (
   "udp_sum" char(10) DEFAULT NULL,
   "udp_sport" int DEFAULT NULL
 );
-
+CREATE INDEX index_guid_defaultudp ON "threatmonitor".udppacket(guid);
+CREATE INDEX index_udp_dport_defaultudp ON "threatmonitor".udppacket(udp_dport);
+CREATE INDEX index_udp_sport_defaultudp ON "threatmonitor".udppacket(udp_sport);
 
 # Wifi
 DROP TABLE "threatmonitor".wifi_ippacket;
