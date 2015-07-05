@@ -42,7 +42,7 @@ monetdb release threatmonitor
 
 monetdb start threatmonitor
 
-Import the schema from the SQL provided
+Import the schema from the SQL provided now moved to sql/
 
 I've now included MySQL Database support also however if your going to create big data sets i think i would use MonetDB
 
