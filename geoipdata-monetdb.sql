@@ -7,6 +7,45 @@
 --           CACHE 2 CYCLE
 -- ) primary key,
 
+DROP TABLE "threatmonitor".geoipdata_ipv4blocks_city;
+CREATE TABLE "threatmonitor".geoipdata_ipv4blocks_city (
+  network varchar(18),
+  geoname_id char(10),
+  registered_country_geoname_id char(30),
+  represented_country_geoname_id char(30),
+  is_anonymous_proxy char(30),
+  is_satellite_provider char(30),
+  postal_code char(30),
+  latitude char(10),
+  longitude char(10)
+);
+
+CREATE INDEX cindex_ipv4_network ON "threatmonitor".geoipdata_ipv4blocks_city(network);
+CREATE INDEX cindex_ipv4_geoname_id ON "threatmonitor".geoipdata_ipv4blocks_city(geoname_id);
+COPY 2519918 OFFSET 2 RECORDS INTO "threatmonitor".geoipdata_ipv4blocks_city FROM '/data2/MaxMind/GeoLite2-City-CSV_20150602/GeoLite2-City-Blocks-IPv4.csv' USING DELIMITERS ',', '\n', '';
+
+
+DROP TABLE "threatmonitor".geoipdata_locations_city;
+CREATE TABLE "threatmonitor".geoipdata_locations_city (
+  geoname_id char(10),
+  locale_code char(2),
+  continent_code char(2),
+  continent_name char(15),
+  country_iso_code char(2),
+  country_name char(50),
+  subdivision_1_iso_code char(70),
+  subdivision_1_name char(50),
+  subdivision_2_iso_code char(70),
+  subdivision_2_name char(50),
+  city_name char(70),
+  metro_code char(30),
+  time_zone char(30)
+);
+
+CREATE INDEX cindex_country_geoname_id ON "threatmonitor".geoipdata_locations_city(geoname_id);
+COPY 80006 OFFSET 2 RECORDS INTO "threatmonitor".geoipdata_locations_city FROM '/data2/MaxMind/GeoLite2-City-CSV_20150602/GeoLite2-City-Locations-en.csv' USING DELIMITERS ',', '\n', '';
+
+
 DROP TABLE "threatmonitor".geoipdata_ipv4blocks_country;
 CREATE TABLE "threatmonitor".geoipdata_ipv4blocks_country (
   network varchar(18),
