@@ -9,13 +9,13 @@
 #
 ########################################################################
 
-require './thm-authorization.rb'
+require "#{File.dirname(__FILE__)}/thm-authorization.rb"
 
 module Thm::Authorization
 
   class Privileges < AuthTemplate
-    
-      puts "\e[1;31m\ Manage User / Group Privileges \e[0m\ \n\n"
+
+      puts "\e[1;34m\ Manage User / Group Privileges \e[0m\ \n\n"
       
       def mkhash(payload)
         hash = Digest::SHA512.new

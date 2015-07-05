@@ -9,7 +9,7 @@
 ########################################################################
 
 require 'getoptlong'
-require './thmmq.rb'
+require "#{File.dirname(__FILE__)}/lib/thmmq.rb"
 
 ARGV[0] = "--help" if ARGV[0] == nil
 

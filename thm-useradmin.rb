@@ -13,7 +13,7 @@
 require 'getoptlong'
 require 'readline'
 require 'io/console'
-require './thm-privileges.rb'
+require "#{File.dirname(__FILE__)}/thm-privileges.rb"
 
 trap("INT") {
   puts "\nSee you soon !"

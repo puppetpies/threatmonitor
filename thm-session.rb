@@ -11,9 +11,10 @@
 ########################################################################
 
 require 'rubygems' if RUBY_VERSION < "1.9"
+require 'chartkick'
 require 'sinatra/base'
 require 'slim'
-require './thm-authentication.rb'
+require "#{File.dirname(__FILE__)}/thm-authentication.rb"
 
 RELEASE = "Deedrah"
 
@@ -32,6 +33,10 @@ end
 
 module ThmUI extend self
 
+  class JSGraphing
+    include Chartkick::Helper
+  end
+  
   class Deedrah < Sinatra::Base
 
     attr_reader :thmsession
@@ -142,7 +147,27 @@ module ThmUI extend self
     get '/js/chartkick.js' do
       send_file 'js/chartkick.js', :type => :js
     end
-    
+
+    get '/js/jquery.min.js' do
+      send_file 'js/jquery.min.js', :type => :js
+    end
+
+    get '/js/JSXTransformer.js' do
+      send_file 'js/JSXTransformer.js', :type => :js
+    end
+
+    get '/js/marked.min.js' do
+      send_file 'js/marked.min.js', :type => :js
+    end
+
+    get '/js/react.js' do
+      send_file 'js/react.js', :type => :js
+    end
+
+    get '/js/files/authenticate.jsx' do
+      send_file 'js/files/authenticate.jsx', :type => :js
+    end
+        
     run!
     
   end

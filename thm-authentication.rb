@@ -9,8 +9,8 @@
 #
 ########################################################################
 
-require './thmmq.rb'
-require './thm-privileges.rb'
+require "#{File.dirname(__FILE__)}/lib//thmmq.rb"
+require "#{File.dirname(__FILE__)}/thm-privileges.rb"
 
 module Thm::Authorization
 
