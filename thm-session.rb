@@ -33,13 +33,11 @@ end
 
 module ThmUI extend self
 
-  class JSGraphing
-    include Chartkick::Helper
-  end
-  
   class Deedrah < Sinatra::Base
 
     attr_reader :thmsession
+    
+    include Chartkick::Helper
     
     set :server, :puma
     set :logging, :true
@@ -121,9 +119,93 @@ module ThmUI extend self
       slim :authenticate
     end
     
+    def geoiplookup(ip)
+      query = "SELECT continent_name, country_name FROM geoipdata_ipv4blocks_country a JOIN geoipdata_locations_country b ON (a.geoname_id = b.geoname_id) WHERE network LIKE '#{ip.split(".")[0]}.#{ip.split(".")[1]}.%' GROUP BY b.continent_name, b.country_name LIMIT 1;"
+      resusrcnt = @sessobj.query("#{query}")
+      while row = resusrcnt.fetch_hash do
+        continent_name = row["continent_name"].to_s
+        country_name = row["country_name"].to_s
+        if continent_name == ""
+          cname = "(#{country_name})"
+        else
+          cname = "(#{continent_name})"
+        end
+      end
+      return cname
+    end
+    
     getpost '/dashboard' do
-      login_lock?
-      slim :dashboard
+      #login_lock?
+      query = "select count(*) as num2,  ip_dst from wifi_ippacket a JOIN wifi_udppacket b on (a.guid = b.guid) JOIN service_definitions s on (s.num = b.udp_dport) where udp_dport > 0 and udp_dport < 10000 and s.protocol = 'UDP' group by b.udp_dport, a.ip_dst;"
+      resusrcnt = @sessobj.query("#{query}")
+      @rowusrcnt = Array.new
+      while row = resusrcnt.fetch_hash do
+        num2 = row["num2"].to_s
+        ip_dst = row["ip_dst"].to_s
+        location = geoiplookup(ip_dst)
+        @rowusrcnt << ["#{ip_dst} #{location}", "#{num2}"]
+      end
+      # TCP
+      query = "select count(*) as num2,  ip_dst from wifi_ippacket a JOIN wifi_tcppacket b on (a.guid = b.guid) JOIN service_definitions s on (s.num = b.tcp_dport) where tcp_dport > 0 and tcp_dport < 10000 and s.protocol = 'TCP' group by b.tcp_dport, a.ip_dst;"
+      resusrcnt = @sessobj.query("#{query}")
+      @rowusrcnt2 = Array.new
+      while row = resusrcnt.fetch_hash do
+        num2 = row["num2"].to_s
+        ip_dst = row["ip_dst"].to_s
+        location = geoiplookup(ip_dst)
+        @rowusrcnt2 << ["#{ip_dst} #{location}", "#{num2}"]
+      end
+      # Service chart UDP
+      query = "select num, description, count(*) as num2 from wifi_ippacket a JOIN wifi_udppacket b on (a.guid = b.guid) JOIN service_definitions s on (s.num = b.udp_dport) where udp_dport > 0 and udp_dport < 10000 and s.protocol = 'UDP' group by b.udp_dport, a.ip_dst, s.description, s.num;"
+      resusrcnt = @sessobj.query("#{query}")
+      @rowusrcnt3 = Array.new
+      while row = resusrcnt.fetch_hash do
+        num = row["num"].to_s
+        desc = row["description"].to_s
+        count = row["num2"].to_s
+        @rowusrcnt3 << ["#{desc} (#{num})", "#{count}"]
+      end
+      # Service chart TCP
+      query = "select num, description, count(*) as num2 from wifi_ippacket a JOIN wifi_tcppacket b on (a.guid = b.guid) JOIN service_definitions s on (s.num = b.tcp_dport) where tcp_dport > 0 and tcp_dport < 10000 and s.protocol = 'TCP' group by b.tcp_dport, a.ip_dst, s.description, s.num;"
+      resusrcnt = @sessobj.query("#{query}")
+      @rowusrcnt4 = Array.new
+      while row = resusrcnt.fetch_hash do
+        num = row["num"].to_s
+        desc = row["description"].to_s
+        count = row["num2"].to_s
+        @rowusrcnt4 << ["#{desc} (#{num})", "#{count}"]
+      end
+      # Top TCP/IP Talkers
+      query = "select count(*) as num2, tcp_dport, ip_dst from wifi_ippacket a JOIN wifi_tcppacket b on (a.guid = b.guid) JOIN service_definitions s on (s.num = b.tcp_dport) where tcp_dport > 0 and tcp_dport < 10000 and s.protocol = 'TCP' group by b.tcp_dport, a.ip_dst order by num2 desc;"
+      resusrcnt = @sessobj.query("#{query}")
+      @rowusrcnt5 = Array.new
+      while row = resusrcnt.fetch_hash do
+        ip_dst = row["ip_dst"].to_s
+        num = row["tcp_dport"].to_s
+        count = row["num2"].to_s
+        location = geoiplookup(ip_dst)
+        @rowusrcnt5 << ["#{ip_dst} #{location} (#{num})", "#{count}"]
+      end
+      # Top UDP/IP Talkers
+      query = "select count(*) as num2, udp_dport, ip_dst from wifi_ippacket a JOIN wifi_udppacket b on (a.guid = b.guid) JOIN service_definitions s on (s.num = b.udp_dport) where udp_dport > 0 and udp_dport < 10000 and s.protocol = 'UDP' group by b.udp_dport, a.ip_dst order by num2 desc;"
+      resusrcnt = @sessobj.query("#{query}")
+      @rowusrcnt6 = Array.new
+      while row = resusrcnt.fetch_hash do
+        ip_dst = row["ip_dst"].to_s
+        num = row["udp_dport"].to_s
+        count = row["num2"].to_s
+        location = geoiplookup(ip_dst)
+        @rowusrcnt6 << ["#{ip_dst} #{location} (#{num})", "#{count}"]
+      end
+      pp @rowusrcnt
+      pp @rowusrcnt2
+      pp @rowusrcnt3
+      pp @rowusrcnt4
+      puts "test"
+      pp @rowusrcnt5
+      pp @rowusrcnt6
+      #@rowusrcnt = resusrcnt.fetch_hash
+      erb :dashboard
     end
     
     get '/status' do
@@ -131,7 +213,7 @@ module ThmUI extend self
       get_session_info?
     end
     
-    getpost '/logout' do
+    get '/logout' do
       # Logout and remove thmsesslock
       if @sessobj.thmsesslock == "OK"
         logout
@@ -167,7 +249,11 @@ module ThmUI extend self
     get '/js/files/authenticate.jsx' do
       send_file 'js/files/authenticate.jsx', :type => :js
     end
-        
+    
+    get '/js/jsapi.js' do
+      send_file 'js/jsapi.js', :type => :js
+    end
+    
     run!
     
   end
