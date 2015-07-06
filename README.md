@@ -12,7 +12,7 @@ Ruby
 Pcaplet - https://github.com/ahobson/ruby-pcap
 PCAPRUB - https://github.com/puppetpies/pcaprub - For Interface Realtime capture / dumping to disk
 
-![Alt text](http://github.com/puppetpies/screenshot-1.jpg "Screen Capture")
+![Dashboard](https://github.com/puppetpies/screenshot-1.jpg)
 
 To build:
 
