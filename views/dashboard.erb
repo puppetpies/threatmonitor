@@ -10,10 +10,47 @@
     <script src="js/chartkick.js"></script>
   </head>
   <body>
-    <h3>Main View</h3>
-    
-    <div id="content">
-      <%= pie_chart @rowusrcnt2, id: "content", height: "500px" %>
+    <h3>Threatmonitor - Overview</h3>
+    <div id="content" style='width:100%; overflow:off;'>
+    <p align="left">Protocol data</p>
+    <table width="100%">
+      <tr><td>UDP Packets</td><td>TCP Packets</td></tr>
+      <tr>
+        <td width="50%">
+        <div align="left" id="content1" style='width:100%; height:100%; transform:scale(0.9);'>
+          <%= pie_chart @rowusrcnt, id: "content1", height: "400px", width: "400px" %>
+        </div></td>
+        <td width="50%">
+        <div align="left" id="content2" style='width:100%; height:100%; transform:scale(0.9);'>
+          <%= pie_chart @rowusrcnt2, id: "content2", height: "400px", width: "400px" %>
+        </div>
+        </td>
+      </tr>
+
+      <tr><td>Top TCP/IP Talkers</td><td>Top UDP/IP Talkers</td></tr>
+      <tr>
+        <td width="50%" height="50%">
+        <div align="left" id="content5" style='width:100%; height:100%; transform:scale(0.9);'>
+          <%= column_chart @rowusrcnt5, id: "content5" %>
+        </div></td>
+        <td width="50%" height="50%">
+        <div align="left" id="content6" style='width:100%; height:100%; transform:scale(0.9);'>
+          <%= column_chart @rowusrcnt6, id: "content6" %>
+        </div></td>
+      </tr>
+            
+      <tr><td>UDP Services</td><td>TCP Services</td></tr>
+      <tr>
+        <td width="50%" height="50%">
+        <div align="left" id="content3" style='width:100%; height:100%; transform:scale(0.9);'>
+          <%= bar_chart @rowusrcnt3, id: "content3" %>
+        </div></td>
+        <td width="50%" height="50%">
+        <div align="left" id="content4" style='width:100%; height:100%; transform:scale(0.9);'>
+          <%= bar_chart @rowusrcnt4, id: "content4" %>
+        </div></td>
+      </tr>
+    </table>
     </div>
     <script type="text/jsx">
     
