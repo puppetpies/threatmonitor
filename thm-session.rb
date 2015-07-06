@@ -31,6 +31,40 @@ class Sinatra::Base
   
 end
 
+
+class Geocounter
+
+  # Create / Add to instance variable
+  def geocount(country)
+    country.gsub!(" ", "_") # no spaces or case
+    if !instance_variable_get("@#{country}")
+      instance_variable_set("@#{country}", 1)
+    else
+      instance_variable_set("@#{country}", instance_variable_get("@#{country}") + 1)
+    end
+    puts "Country: #{country} Value: "+instance_variable_get("@#{country}").to_s
+  end
+
+  # Read a single country
+  def geocount_reader(country)
+    country.gsub!(" ", "_") # no spaces or case
+    valnum = instance_variable_get("@#{country}")
+    return valnum
+  end
+
+  # Compile in array with the totals of all instance variables
+  def geocount_compile
+    countrycounts = Array.new
+    instance_variables.each {|n|
+      t = n.to_s.gsub("@", "")
+      countrycounts << ["#{t}", instance_variable_get("#{n}")]
+    }
+    return countrycounts
+    countrycounts
+  end
+
+end
+
 module ThmUI extend self
 
   class Deedrah < Sinatra::Base
@@ -125,38 +159,48 @@ module ThmUI extend self
       while row = resusrcnt.fetch_hash do
         continent_name = row["continent_name"].to_s
         country_name = row["country_name"].to_s
-        if continent_name == ""
+        #if continent_name == ""
           cname = "(#{country_name})"
-        else
-          cname = "(#{continent_name})"
-        end
+        #else
+        #  cname = "(#{continent_name})"
+        #end
       end
+     # geoipcount(
       return cname
     end
     
     getpost '/dashboard' do
       #login_lock?
-      query = "select count(*) as num2,  ip_dst from wifi_ippacket a JOIN wifi_udppacket b on (a.guid = b.guid) JOIN service_definitions s on (s.num = b.udp_dport) where udp_dport > 0 and udp_dport < 10000 and s.protocol = 'UDP' group by b.udp_dport, a.ip_dst;"
+      query = "select count(*) as num2,  ip_dst from wifi_ippacket a JOIN wifi_udppacket b on (a.guid = b.guid) JOIN service_definitions s on (s.num = b.udp_dport) where udp_dport > 0 and udp_dport < 10000 and s.protocol = 'UDP' and ip_dst not in ('255.255.255.255') group by b.udp_dport, a.ip_dst;"
       resusrcnt = @sessobj.query("#{query}")
       @rowusrcnt = Array.new
       while row = resusrcnt.fetch_hash do
         num2 = row["num2"].to_s
         ip_dst = row["ip_dst"].to_s
         location = geoiplookup(ip_dst)
+        @gcnt = Geocounter.new
+        locfix = location.to_s.gsub("(", "").gsub(")", "") # Yawn
+        if location != nil or location == ""
+          @gcnt.geocount("#{locfix}")
+        end
         @rowusrcnt << ["#{ip_dst} #{location}", "#{num2}"]
       end
       # TCP
-      query = "select count(*) as num2,  ip_dst from wifi_ippacket a JOIN wifi_tcppacket b on (a.guid = b.guid) JOIN service_definitions s on (s.num = b.tcp_dport) where tcp_dport > 0 and tcp_dport < 10000 and s.protocol = 'TCP' group by b.tcp_dport, a.ip_dst;"
+      query = "select count(*) as num2,  ip_dst from wifi_ippacket a JOIN wifi_tcppacket b on (a.guid = b.guid) JOIN service_definitions s on (s.num = b.tcp_dport) where tcp_dport > 0 and tcp_dport < 10000 and s.protocol = 'TCP' and ip_dst not in ('255.255.255.255') group by b.tcp_dport, a.ip_dst;"
       resusrcnt = @sessobj.query("#{query}")
       @rowusrcnt2 = Array.new
       while row = resusrcnt.fetch_hash do
         num2 = row["num2"].to_s
         ip_dst = row["ip_dst"].to_s
         location = geoiplookup(ip_dst)
+        locfix = location.to_s.gsub("(", "").gsub(")", "") # Yawn
+        if location != nil or location == ""
+          @gcnt.geocount("#{locfix}")
+        end
         @rowusrcnt2 << ["#{ip_dst} #{location}", "#{num2}"]
       end
       # Service chart UDP
-      query = "select num, description, count(*) as num2 from wifi_ippacket a JOIN wifi_udppacket b on (a.guid = b.guid) JOIN service_definitions s on (s.num = b.udp_dport) where udp_dport > 0 and udp_dport < 10000 and s.protocol = 'UDP' group by b.udp_dport, a.ip_dst, s.description, s.num;"
+      query = "select num, description, count(*) as num2 from wifi_ippacket a JOIN wifi_udppacket b on (a.guid = b.guid) JOIN service_definitions s on (s.num = b.udp_dport) where udp_dport > 0 and udp_dport < 10000 and s.protocol = 'UDP' and ip_dst not in ('255.255.255.255') group by b.udp_dport, a.ip_dst, s.description, s.num;"
       resusrcnt = @sessobj.query("#{query}")
       @rowusrcnt3 = Array.new
       while row = resusrcnt.fetch_hash do
@@ -166,7 +210,7 @@ module ThmUI extend self
         @rowusrcnt3 << ["#{desc} (#{num})", "#{count}"]
       end
       # Service chart TCP
-      query = "select num, description, count(*) as num2 from wifi_ippacket a JOIN wifi_tcppacket b on (a.guid = b.guid) JOIN service_definitions s on (s.num = b.tcp_dport) where tcp_dport > 0 and tcp_dport < 10000 and s.protocol = 'TCP' group by b.tcp_dport, a.ip_dst, s.description, s.num;"
+      query = "select num, description, count(*) as num2 from wifi_ippacket a JOIN wifi_tcppacket b on (a.guid = b.guid) JOIN service_definitions s on (s.num = b.tcp_dport) where tcp_dport > 0 and tcp_dport < 10000 and s.protocol = 'TCP' and ip_dst not in ('255.255.255.255') group by b.tcp_dport, a.ip_dst, s.description, s.num;"
       resusrcnt = @sessobj.query("#{query}")
       @rowusrcnt4 = Array.new
       while row = resusrcnt.fetch_hash do
@@ -176,7 +220,7 @@ module ThmUI extend self
         @rowusrcnt4 << ["#{desc} (#{num})", "#{count}"]
       end
       # Top TCP/IP Talkers
-      query = "select count(*) as num2, tcp_dport, ip_dst from wifi_ippacket a JOIN wifi_tcppacket b on (a.guid = b.guid) JOIN service_definitions s on (s.num = b.tcp_dport) where tcp_dport > 0 and tcp_dport < 10000 and s.protocol = 'TCP' group by b.tcp_dport, a.ip_dst order by num2 desc;"
+      query = "select count(*) as num2, tcp_dport, ip_dst from wifi_ippacket a JOIN wifi_tcppacket b on (a.guid = b.guid) JOIN service_definitions s on (s.num = b.tcp_dport) where tcp_dport > 0 and tcp_dport < 10000 and s.protocol = 'TCP' and ip_dst not in ('255.255.255.255') group by b.tcp_dport, a.ip_dst order by num2 desc;"
       resusrcnt = @sessobj.query("#{query}")
       @rowusrcnt5 = Array.new
       while row = resusrcnt.fetch_hash do
@@ -187,7 +231,7 @@ module ThmUI extend self
         @rowusrcnt5 << ["#{ip_dst} #{location} (#{num})", "#{count}"]
       end
       # Top UDP/IP Talkers
-      query = "select count(*) as num2, udp_dport, ip_dst from wifi_ippacket a JOIN wifi_udppacket b on (a.guid = b.guid) JOIN service_definitions s on (s.num = b.udp_dport) where udp_dport > 0 and udp_dport < 10000 and s.protocol = 'UDP' group by b.udp_dport, a.ip_dst order by num2 desc;"
+      query = "select count(*) as num2, udp_dport, ip_dst from wifi_ippacket a JOIN wifi_udppacket b on (a.guid = b.guid) JOIN service_definitions s on (s.num = b.udp_dport) where udp_dport > 0 and udp_dport < 10000 and s.protocol = 'UDP' and ip_dst not in ('255.255.255.255') group by b.udp_dport, a.ip_dst order by num2 desc;"
       resusrcnt = @sessobj.query("#{query}")
       @rowusrcnt6 = Array.new
       while row = resusrcnt.fetch_hash do
@@ -201,6 +245,7 @@ module ThmUI extend self
       pp @rowusrcnt2
       pp @rowusrcnt3
       pp @rowusrcnt4
+      @rowgeocount = @gcnt.geocount_compile
       puts "test"
       pp @rowusrcnt5
       pp @rowusrcnt6
