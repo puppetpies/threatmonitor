@@ -25,7 +25,12 @@ Gem::Specification.new do |spec|
     "thm-useradmin.rb",
     "thm-pcap.rb",
     "service_definitions.csv"
-    "lib/thmmq.rb",
+    "lib/thm.rb",
+    "lib/thm/consumer.rb",
+    "lib/thm/dataservices.rb",
+    "lib/thm/localmachine.rb",
+    "lib/thm/producer.rb",
+    "lib/thm/version.rb",
     "js/jquery.min.js",
     "js/chartkick.js",
     "js/JSXTransformer.js",
