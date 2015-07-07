@@ -36,7 +36,7 @@ Gem::Specification.new do |spec|
     "sql/threatmonitor-monetdb.sql",
     "sql/threatmonitor-mysql.sql",
     "views/authenticate.slim",
-    "views/dashboard.slim",
+    "views/dashboard.erb",
     "views/logout.slim"
   ]
 
