@@ -9,7 +9,7 @@
 ########################################################################
 
 require 'getoptlong'
-require "#{File.dirname(__FILE__)}/lib/thmmq.rb"
+require "#{File.dirname(__FILE__)}/lib/thm.rb"
 
 ARGV[0] = "--help" if ARGV[0] == nil
 
@@ -56,11 +56,11 @@ end
 puts banner
 # See thmmq.rb for list for variables
 obj = Thm::Producer.new
-obj.datastore = "mysql"
-obj.dbhost = "172.17.0.1"
-obj.dbuser = "threatmonitor"
-obj.dbpass = "dk3rbi9L"
-obj.dbname = "threatmonitor"
+obj.datastore = "monetdb"
+#obj.dbhost = "172.17.0.1"
+#obj.dbuser = "threatmonitor"
+#obj.dbpass = "dk3rbi9L"
+#obj.dbname = "threatmonitor"
 obj.queueprefix = @queueprefix
 obj.mqconnect
 obj.dbconnect unless @modeparam == "capture"

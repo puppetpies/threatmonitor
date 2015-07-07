@@ -9,7 +9,7 @@
 ########################################################################
 
 require 'digest'
-require "#{File.dirname(__FILE__)}/lib/thmmq.rb"
+require "#{File.dirname(__FILE__)}/lib/thm.rb"
 require 'pp'
 
 puts "\e[1;33m\Threatmonitor - User Administration\e[0m\ "
