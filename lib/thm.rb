@@ -36,7 +36,6 @@ module Tools
   
 end
 
-puts Dir.pwd
 # Load Datasources
 require "#{File.dirname(__FILE__)}/thm/dataservices.rb"
 require "#{File.dirname(__FILE__)}/thm/producer.rb"
