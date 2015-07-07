@@ -168,88 +168,72 @@ module ThmUI extend self
      # geoipcount(
       return cname
     end
+
+    def packetcounts(proto)
+      # Retrieve 
+      query = "select count(*) as num2,  ip_dst from wifi_ippacket a JOIN wifi_#{proto}packet b on (a.guid = b.guid) JOIN service_definitions s on (s.num = b.#{proto}_dport) where #{proto}_dport > 0 and #{proto}_dport < 10000 and s.protocol = '#{proto.upcase}' and ip_dst not in ('255.255.255.255') group by b.#{proto}_dport, a.ip_dst;"
+      resusrcnt = @sessobj.query("#{query}")
+      rowusrcnt = Array.new
+      @gcnt = Geocounter.new
+      while row = resusrcnt.fetch_hash do
+        num2 = row["num2"].to_s
+        ip_dst = row["ip_dst"].to_s
+        location = geoiplookup(ip_dst)
+        locfix = location.to_s.gsub("(", "").gsub(")", "") # Yawn
+        if location != nil or location == ""
+          @gcnt.geocount("#{locfix}")
+        end
+        rowusrcnt << ["#{ip_dst} #{location}", "#{num2}"]
+      end    
+      return rowusrcnt
+    end
+    
+    def servicecounts(proto)
+      query = "select num, description, count(*) as num2 from wifi_ippacket a JOIN wifi_#{proto}packet b on (a.guid = b.guid) JOIN service_definitions s on (s.num = b.#{proto}_dport) where #{proto}_dport > 0 and #{proto}_dport < 10000 and s.protocol = '#{proto.upcase}' and ip_dst not in ('255.255.255.255') group by b.#{proto}_dport, a.ip_dst, s.description, s.num;"
+      resusrcnt = @sessobj.query("#{query}")
+      rowusrcnt = Array.new
+      while row = resusrcnt.fetch_hash do
+        num = row["num"].to_s
+        desc = row["description"].to_s
+        count = row["num2"].to_s
+        rowusrcnt << ["#{desc} (#{num})", "#{count}"]
+      end
+      return rowusrcnt 
+    end
+    
+    def toptalkers(proto)
+      query = "select count(*) as num2, #{proto}_dport, ip_dst from wifi_ippacket a JOIN wifi_#{proto}packet b on (a.guid = b.guid) JOIN service_definitions s on (s.num = b.#{proto}_dport) where #{proto}_dport > 0 and #{proto}_dport < 10000 and s.protocol = '#{proto.upcase}' and ip_dst not in ('255.255.255.255') group by b.#{proto}_dport, a.ip_dst order by num2 desc;"
+      resusrcnt = @sessobj.query("#{query}")
+      rowusrcnt = Array.new
+      while row = resusrcnt.fetch_hash do
+        ip_dst = row["ip_dst"].to_s
+        num = row["#{proto}_dport"].to_s
+        count = row["num2"].to_s
+        location = geoiplookup(ip_dst)
+        rowusrcnt << ["#{ip_dst} #{location} (#{num})", "#{count}"]
+      end
+      return rowusrcnt
+    end
     
     getpost '/dashboard' do
-      #login_lock?
-      query = "select count(*) as num2,  ip_dst from wifi_ippacket a JOIN wifi_udppacket b on (a.guid = b.guid) JOIN service_definitions s on (s.num = b.udp_dport) where udp_dport > 0 and udp_dport < 10000 and s.protocol = 'UDP' and ip_dst not in ('255.255.255.255') group by b.udp_dport, a.ip_dst;"
-      resusrcnt = @sessobj.query("#{query}")
-      @rowusrcnt = Array.new
-      while row = resusrcnt.fetch_hash do
-        num2 = row["num2"].to_s
-        ip_dst = row["ip_dst"].to_s
-        location = geoiplookup(ip_dst)
-        @gcnt = Geocounter.new
-        locfix = location.to_s.gsub("(", "").gsub(")", "") # Yawn
-        if location != nil or location == ""
-          @gcnt.geocount("#{locfix}")
-        end
-        @rowusrcnt << ["#{ip_dst} #{location}", "#{num2}"]
-      end
+      login_lock?
+      # UDP
+      @rowusrcnt = packetcounts("udp")
       # TCP
-      query = "select count(*) as num2,  ip_dst from wifi_ippacket a JOIN wifi_tcppacket b on (a.guid = b.guid) JOIN service_definitions s on (s.num = b.tcp_dport) where tcp_dport > 0 and tcp_dport < 10000 and s.protocol = 'TCP' and ip_dst not in ('255.255.255.255') group by b.tcp_dport, a.ip_dst;"
-      resusrcnt = @sessobj.query("#{query}")
-      @rowusrcnt2 = Array.new
-      while row = resusrcnt.fetch_hash do
-        num2 = row["num2"].to_s
-        ip_dst = row["ip_dst"].to_s
-        location = geoiplookup(ip_dst)
-        locfix = location.to_s.gsub("(", "").gsub(")", "") # Yawn
-        if location != nil or location == ""
-          @gcnt.geocount("#{locfix}")
-        end
-        @rowusrcnt2 << ["#{ip_dst} #{location}", "#{num2}"]
-      end
+      @rowusrcnt2 = packetcounts("tcp")
       # Service chart UDP
-      query = "select num, description, count(*) as num2 from wifi_ippacket a JOIN wifi_udppacket b on (a.guid = b.guid) JOIN service_definitions s on (s.num = b.udp_dport) where udp_dport > 0 and udp_dport < 10000 and s.protocol = 'UDP' and ip_dst not in ('255.255.255.255') group by b.udp_dport, a.ip_dst, s.description, s.num;"
-      resusrcnt = @sessobj.query("#{query}")
-      @rowusrcnt3 = Array.new
-      while row = resusrcnt.fetch_hash do
-        num = row["num"].to_s
-        desc = row["description"].to_s
-        count = row["num2"].to_s
-        @rowusrcnt3 << ["#{desc} (#{num})", "#{count}"]
-      end
+      @rowusrcnt3 = servicecounts("udp")
       # Service chart TCP
-      query = "select num, description, count(*) as num2 from wifi_ippacket a JOIN wifi_tcppacket b on (a.guid = b.guid) JOIN service_definitions s on (s.num = b.tcp_dport) where tcp_dport > 0 and tcp_dport < 10000 and s.protocol = 'TCP' and ip_dst not in ('255.255.255.255') group by b.tcp_dport, a.ip_dst, s.description, s.num;"
-      resusrcnt = @sessobj.query("#{query}")
-      @rowusrcnt4 = Array.new
-      while row = resusrcnt.fetch_hash do
-        num = row["num"].to_s
-        desc = row["description"].to_s
-        count = row["num2"].to_s
-        @rowusrcnt4 << ["#{desc} (#{num})", "#{count}"]
-      end
+      @rowusrcnt4 = servicecounts("tcp")
       # Top TCP/IP Talkers
-      query = "select count(*) as num2, tcp_dport, ip_dst from wifi_ippacket a JOIN wifi_tcppacket b on (a.guid = b.guid) JOIN service_definitions s on (s.num = b.tcp_dport) where tcp_dport > 0 and tcp_dport < 10000 and s.protocol = 'TCP' and ip_dst not in ('255.255.255.255') group by b.tcp_dport, a.ip_dst order by num2 desc;"
-      resusrcnt = @sessobj.query("#{query}")
-      @rowusrcnt5 = Array.new
-      while row = resusrcnt.fetch_hash do
-        ip_dst = row["ip_dst"].to_s
-        num = row["tcp_dport"].to_s
-        count = row["num2"].to_s
-        location = geoiplookup(ip_dst)
-        @rowusrcnt5 << ["#{ip_dst} #{location} (#{num})", "#{count}"]
-      end
+      @rowusrcnt5 = toptalkers("udp")
       # Top UDP/IP Talkers
-      query = "select count(*) as num2, udp_dport, ip_dst from wifi_ippacket a JOIN wifi_udppacket b on (a.guid = b.guid) JOIN service_definitions s on (s.num = b.udp_dport) where udp_dport > 0 and udp_dport < 10000 and s.protocol = 'UDP' and ip_dst not in ('255.255.255.255') group by b.udp_dport, a.ip_dst order by num2 desc;"
-      resusrcnt = @sessobj.query("#{query}")
-      @rowusrcnt6 = Array.new
-      while row = resusrcnt.fetch_hash do
-        ip_dst = row["ip_dst"].to_s
-        num = row["udp_dport"].to_s
-        count = row["num2"].to_s
-        location = geoiplookup(ip_dst)
-        @rowusrcnt6 << ["#{ip_dst} #{location} (#{num})", "#{count}"]
-      end
-      pp @rowusrcnt
-      pp @rowusrcnt2
-      pp @rowusrcnt3
-      pp @rowusrcnt4
+      @rowusrcnt6 = toptalkers("tcp")
       @rowgeocount = @gcnt.geocount_compile
-      puts "test"
-      pp @rowusrcnt5
-      pp @rowusrcnt6
-      #@rowusrcnt = resusrcnt.fetch_hash
+      puts "Geo Data:"
+      @rowgeocount.each {|n, x|
+        puts "#{n} #{x}"
+      }
       erb :dashboard
     end
     
