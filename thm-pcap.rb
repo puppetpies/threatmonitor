@@ -11,6 +11,9 @@
 
 require 'getoptlong'
 require "#{File.dirname(__FILE__)}/lib/thm.rb"
+require "#{File.dirname(__FILE__)}/config.rb"
+
+include Thm::Defaults
 
 ARGV[0] = "--help" if ARGV[0] == nil
 
@@ -42,14 +45,19 @@ end
 puts banner
 # See thmmq.rb for list for variables
 obj = Thm::Localmachine.new
-obj.datastore = "mysql"
-obj.dbhost = "172.17.0.1"
-obj.dbuser = "threatmonitor"
-obj.dbpass = "dk3rbi9L"
-obj.dbname = "threatmonitor"
-obj.tblname_ippacket = "wifi_ippacket"
-obj.tblname_tcppacket = "wifi_tcppacket"
-obj.tblname_udppacket = "wifi_udppacket"
+obj.datastore = DATASTORE
+obj.mqhost = MQHOST
+obj.mquser = MQUSER
+obj.mqpass = MQPASS
+obj.mqvhost = MQVHOST
+obj.dbhost = DBHOST
+obj.dbuser = DBUSER
+obj.dbpass = DBPASS
+obj.dbname = DBNAME
+obj.queueprefix = QUEUEPREFIX
+obj.tblname_ippacket = TBLNAME_IPPACKET
+obj.tblname_tcppacket = TBLNAME_TCPPACKET
+obj.tblname_udppacket = TBLNAME_UDPPACKET
 obj.dbconnect
 # Send data to database from queue
 if @pcapfile.nil? == false

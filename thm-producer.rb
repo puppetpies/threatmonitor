@@ -10,13 +10,16 @@
 
 require 'getoptlong'
 require "#{File.dirname(__FILE__)}/lib/thm.rb"
+require "#{File.dirname(__FILE__)}/config.rb"
+
+include Thm::Defaults
 
 ARGV[0] = "--help" if ARGV[0] == nil
 
 opts = GetoptLong.new(
   [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
   [ '--mode', '-m', GetoptLong::REQUIRED_ARGUMENT ],
-  [ '--queueprefix', '-q', GetoptLong::REQUIRED_ARGUMENT ],
+  [ '--queueprefix', '-q', GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--interface', '-i', GetoptLong::REQUIRED_ARGUMENT ],
   [ '--filter', '-f', GetoptLong::REQUIRED_ARGUMENT ]
 )
@@ -33,7 +36,7 @@ opts.each do |opt, arg|
    
 -m, --mode database / capture [ REQUIRED ]
   
--q, --queueprefix queue name [ REQUIRED ]
+-q, --queueprefix queue name [ OPTIONAL ] [ Uses config.rb ]
 
 -i --interface network interface [ REQUIRED ]
  
@@ -56,12 +59,23 @@ end
 puts banner
 # See thmmq.rb for list for variables
 obj = Thm::Producer.new
-obj.datastore = "monetdb"
-#obj.dbhost = "172.17.0.1"
-#obj.dbuser = "threatmonitor"
-#obj.dbpass = "dk3rbi9L"
-#obj.dbname = "threatmonitor"
-obj.queueprefix = @queueprefix
+obj.datastore = DATASTORE
+obj.mqhost = MQHOST
+obj.mquser = MQUSER
+obj.mqpass = MQPASS
+obj.mqvhost = MQVHOST
+obj.dbhost = DBHOST
+obj.dbuser = DBUSER
+obj.dbpass = DBPASS
+obj.dbname = DBNAME
+if !defined? @queueprefix
+  obj.queueprefix = QUEUEPREFIX
+else
+  obj.queueprefix = @queueprefix
+end
+obj.tblname_ippacket = TBLNAME_IPPACKET
+obj.tblname_tcppacket = TBLNAME_TCPPACKET
+obj.tblname_udppacket = TBLNAME_UDPPACKET
 obj.mqconnect
 obj.dbconnect unless @modeparam == "capture"
 mode = @modeparam
