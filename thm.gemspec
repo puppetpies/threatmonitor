@@ -24,7 +24,7 @@ Gem::Specification.new do |spec|
     "thm-session.rb",
     "thm-useradmin.rb",
     "thm-pcap.rb",
-    "service_definitions.csv"
+    "service_definitions.csv",
     "lib/thm.rb",
     "lib/thm/consumer.rb",
     "lib/thm/dataservices.rb",
