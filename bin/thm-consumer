@@ -8,10 +8,11 @@
 # Producer - Save data from queue to Database
 #
 ########################################################################
-
+#puts Dir.getwd
 require 'getoptlong'
-require "#{File.dirname(__FILE__)}/lib/thm.rb"
-require "#{File.dirname(__FILE__)}/config.rb"
+require File.expand_path(File.join(
+          File.dirname(__FILE__),
+          "../lib/thm.rb", "../../config.rb"))
 
 include Thm::Defaults
 

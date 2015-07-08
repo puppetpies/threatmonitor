@@ -15,7 +15,9 @@ require 'rubygems' if RUBY_VERSION < "1.9"
 require 'chartkick'
 require 'sinatra/base'
 require 'slim'
-require "#{File.dirname(__FILE__)}/thm-authentication.rb"
+require File.expand_path(File.join(
+          File.dirname(__FILE__),
+          "../../thm-authentication.rb"))
 
 RELEASE = "Deedrah"
 
