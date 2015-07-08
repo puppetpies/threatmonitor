@@ -12,7 +12,11 @@
 require 'getoptlong'
 require File.expand_path(File.join(
           File.dirname(__FILE__),
-          "../lib/thm.rb", "../../config.rb"))
+          "../lib/thm.rb"))
+
+require File.expand_path(File.join(
+          File.dirname(__FILE__),
+	 "../config.rb"))
 
 include Thm::Defaults
 

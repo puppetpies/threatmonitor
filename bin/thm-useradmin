@@ -16,7 +16,7 @@ require 'readline'
 require 'io/console'
 require File.expand_path(File.join(
           File.dirname(__FILE__),
-          "../../thm-privileges.rb"))
+          "../thm-privileges.rb"))
 
 trap("INT") {
   puts "\nSee you soon !"
