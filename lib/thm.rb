@@ -16,7 +16,10 @@ require 'guid'
 require 'yaml'
 require 'pcaplet'
 require 'pcaprub' # For Live capture / write
-require './datalayerlight.rb'
+#require '../datalayerlight.rb'
+require File.expand_path(File.join(
+          File.dirname(__FILE__),
+          "../datalayerlight.rb"))
 include Pcap
 
 # TODO
@@ -35,12 +38,32 @@ module Tools
   end
   
 end
-
+puts Dir.pwd
 # Load Datasources
-require "#{File.dirname(__FILE__)}/thm/dataservices.rb"
-require "#{File.dirname(__FILE__)}/thm/producer.rb"
-require "#{File.dirname(__FILE__)}/thm/consumer.rb"
-require "#{File.dirname(__FILE__)}/thm/localmachine.rb"
-require "#{File.dirname(__FILE__)}/thm/version.rb"
+require File.expand_path(File.join(
+          File.dirname(__FILE__),
+          "../lib/thm/dataservices.rb"))
+
+require File.expand_path(File.join(
+          File.dirname(__FILE__), 
+	  "../lib/thm/producer.rb"))
+
+require File.expand_path(File.join(
+          File.dirname(__FILE__),
+	  "../lib/thm/consumer.rb"))
+
+require File.expand_path(File.join(
+          File.dirname(__FILE__), 
+	  "../lib/thm/localmachine.rb"))
+
+require File.expand_path(File.join(
+          File.dirname(__FILE__),
+	  "../lib/thm/version.rb"))
+          
+#require "#{File.dirname(__FILE__)}/"
+#require "#{File.dirname(__FILE__)}/"
+#require "#{File.dirname(__FILE__)}/"
+#require "#{File.dirname(__FILE__)}/"
+#require "#{File.dirname(__FILE__)}/"
 
 
