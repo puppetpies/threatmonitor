@@ -1,7 +1,7 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-VERSION = "0.1.5"
+VERSION = "0.1.7"
 
 Gem::Specification.new do |spec|
   spec.name          = "thm"
@@ -10,20 +10,22 @@ Gem::Specification.new do |spec|
   spec.email         = "brianh6854@googlemail.com"
   spec.description   = "Threatmonitor - Packet Capture / Analysis Suite"
   spec.summary       = "Packet Data Analysis"
+  spec.executables = ["thm-consumer", "thm-producer", "thm-session", "thm-useradmin", "thm-pcap"]
   spec.homepage      = "https://github.com/puppetpies/threatmonitor"
   spec.requirements  = "libpcap"
   spec.license       = "MIT"
 
   spec.files = [
+    "config.rb".
     "datalayerlight.rb",
     "thm-authentication.rb",
     "thm-authorization.rb",
-    "thm-consumer.rb",
-    "thm-producer.rb",
+    "bin/thm-consumer",
+    "bin/thm-producer",
+    "bin/thm-session",
+    "bin/thm-useradmin",
+    "bin/thm-pcap",
     "thm-privileges.rb",
-    "thm-session.rb",
-    "thm-useradmin.rb",
-    "thm-pcap.rb",
     "service_definitions.csv",
     "lib/thm.rb",
     "lib/thm/consumer.rb",
@@ -64,4 +66,5 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "chartkick", "~> 1.3"
   spec.add_runtime_dependency "sinatra", "~> 1.4"
   spec.add_runtime_dependency "slim", "~> 3.0"
+
 end
