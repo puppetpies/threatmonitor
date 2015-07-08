@@ -16,7 +16,7 @@ Gem::Specification.new do |spec|
   spec.license       = "MIT"
 
   spec.files = [
-    "config.rb".
+    "config.rb",
     "datalayerlight.rb",
     "thm-authentication.rb",
     "thm-authorization.rb",
