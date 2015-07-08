@@ -1,7 +1,7 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-VERSION = "0.1.7"
+VERSION = "0.1.8"
 
 Gem::Specification.new do |spec|
   spec.name          = "thm"
@@ -38,6 +38,7 @@ Gem::Specification.new do |spec|
     "js/JSXTransformer.js",
     "js/marked.min.js",
     "js/react.js",
+    "js/files/authenticate.jsx",
     "stylesheets/screen.css",
     "sql/geoipdata-monetdb.sql",
     "sql/threatmonitor-monetdb.sql",
