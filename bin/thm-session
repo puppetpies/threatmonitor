@@ -15,9 +15,11 @@ require 'rubygems' if RUBY_VERSION < "1.9"
 require 'chartkick'
 require 'sinatra/base'
 require 'slim'
+require 'colorize'
+
 require File.expand_path(File.join(
           File.dirname(__FILE__),
-          "../../thm-authentication.rb"))
+          "../thm-authentication.rb"))
 
 RELEASE = "Deedrah"
 
@@ -78,7 +80,8 @@ module ThmUI extend self
     
     set :server, :puma
     set :logging, :true
-	
+    set :app_file, __FILE__
+
     configure do
       enable :session
     end
@@ -90,7 +93,26 @@ module ThmUI extend self
     set :title, "Threatmonitor - Packet Analysis Suite #{RELEASE}"
     set :port, 4567
     set :bind, "0.0.0.0"
+    # Global helpers
+    #helpers ApplicationHelper
+
+    # Set folders for template to
+    set :root, File.expand_path(File.join(File.dirname(__FILE__), '../'))
+    puts root.green
     
+    templateroot = File.expand_path(File.join(File.dirname(__FILE__), '../views'))
+    set :sessions,
+        :httponly       => true,
+        :secure         => production?,
+        :expire_after   => 3600, # 1 hour
+	#:views          => File.expand_path(File.expand_path('../../views/', __FILE__)),
+	:views		=> Proc.new { File.join(root, "views") },
+	#:layout_engine  => :slim,
+	:public_folder => File.dirname(__FILE__) + '/bin'
+
+    enable :method_override
+    
+    puts "TemplateRoot: #{templateroot}".to_s
     def objstart!
       @sessobj = Thm::Authorization::Authentication.new
       @sessobj.datastore = "monetdb"
