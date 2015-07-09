@@ -11,11 +11,15 @@ RabbitMQ
 
 MonetDB or MySQL
 
-Ruby
+Ruby 2.1.x ( 2.2 we have a issue building eventmachine native )
+
+Libpcap 1.5.3 ( For pcaplet to build )
 
 Pcaplet - https://github.com/ahobson/ruby-pcap
 
-PCAPRUB - https://github.com/puppetpies/pcaprub - For Interface Realtime capture / dumping to disk
+PCAPRUB - https://github.com/puppetpies/pcaprub - For Interface Realtime capture / dumping to disk ( Comming soon )
+
+Docker Image ( Very soon )
 
 ![Dashboard](https://raw.githubusercontent.com/puppetpies/threatmonitor/master/screenshot-1.jpg)
 
