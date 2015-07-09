@@ -1,38 +1,47 @@
-Threatmonitor Overview
-======================
+Threatmonitor Packet Analysis Suite HOWTO
+=========================================
+
+To import example data.
+
+mclient -u monetdb -d threatmonitor < threatmonitor-exampledata.sql
+
+password same as username per monetdb default admin user setup.
+
+Will also need to import the GeoIP Data.
+
+The web interface admin login is admin - default password goblin
+
+You will also need the GeoIP Data importing as well for the Web interface Dashboard the operate
+
+mclient -u monetdb -d threatmonitor < geoip-import.sql
+
+Web Interface
+
+http://172.17.0.1:4567/dashboard
+
+Your defaults file is the config.rb in the gem directory for now.
+
+/usr/local/lib/ruby/gems/2.1.0/gems/thm-0.1.9/config.rb
+
+To Capture data:
+
+thm-producer -m capture -i eth0
+
+To Consume data into the Database
+
+thm-consumer -r
+
+For the RabbitMQ Admin http://172.17.0.1:15672 - admin password goblin
+
+Please note
+
+gem install thm
+
+To Keep everything upto date with the current release.
+
+Have fun!
 
 
-Sending data to a RabbitMQ queue so you can grab the data later.
-
-Please note that the queue prefix -q the queue will end up named wifi_iptables etc ...
-
-ruby thm-producer.rb -m capture -q wifi
-
-Loading your data into a database.
-
-You can change the queue it reads from / databases tables it loads into in the code just make sure you've created the database tables.
-
-obj = Thm::Consumer.new
-obj.queueprefix = "wifi"
-obj.tblname_ippacket = "wifi_ippacket"
-obj.tblname_tcppacket = "wifi_tcppacket"
-obj.tblname_udppacket = "wifi_udppacket"
-
-ruby thm-consumer.rb
-
-How to load a pcap file.
-
-obj = Thm::Localmachine.new
-obj.tblname_ippacket = "wifi_ippacket"
-obj.tblname_tcppacket = "wifi_tcppacket"
-obj.tblname_udppacket = "wifi_udppacket"
-obj.dbconnect
-
-ruby thm-pcap.rb -f Example2.pcap
-
-Thats really all the is to it.
-
-Enjoy!
 
 Brian Hood
 
