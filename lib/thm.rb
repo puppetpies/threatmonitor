@@ -38,7 +38,7 @@ module Tools
   end
   
 end
-puts Dir.pwd
+
 # Load Datasources
 require File.expand_path(File.join(
           File.dirname(__FILE__),
