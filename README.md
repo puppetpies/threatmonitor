@@ -21,7 +21,7 @@ PCAPRUB - https://github.com/puppetpies/pcaprub - For Interface Realtime capture
 
 Docker Image ( Very soon )
 
-Rubygem released 0.1.9 at time of writing ( gem install thm )
+Rubygem released 0.1.9 at time of writing ( gem install thm ) https://rubygems.org/gems/thm
 
 ![Dashboard](https://raw.githubusercontent.com/puppetpies/threatmonitor/master/screenshot-1.jpg)
 
