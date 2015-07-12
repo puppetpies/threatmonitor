@@ -59,11 +59,3 @@ require File.expand_path(File.join(
 require File.expand_path(File.join(
           File.dirname(__FILE__),
 	  "../lib/thm/version.rb"))
-          
-#require "#{File.dirname(__FILE__)}/"
-#require "#{File.dirname(__FILE__)}/"
-#require "#{File.dirname(__FILE__)}/"
-#require "#{File.dirname(__FILE__)}/"
-#require "#{File.dirname(__FILE__)}/"
-
-
