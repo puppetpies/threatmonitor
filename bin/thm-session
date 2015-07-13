@@ -60,6 +60,8 @@ class Geocounter
   # Compile in array with the totals of all instance variables
   def geocount_compile
     countrycounts = Array.new
+    # You can't really inherit this class as the other class may also contain instance variables
+    # its not really an exact logic this class only works alone.
     instance_variables.each {|n|
       t = n.to_s.gsub("@", "")
       countrycounts << ["#{t}", instance_variable_get("#{n}")]
