@@ -16,7 +16,6 @@ require 'guid'
 require 'yaml'
 require 'pcaplet'
 require 'pcaprub' # For Live capture / write
-#require '../datalayerlight.rb'
 require File.expand_path(File.join(
           File.dirname(__FILE__),
           "../datalayerlight.rb"))
