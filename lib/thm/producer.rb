@@ -163,18 +163,18 @@ module Thm
             udppacketsql = "SELECT * FROM #{@tblname_udppacket} WHERE guid = '#{guid}'"
             res3 = @conn.query("#{udppacketsql}")
             while row3 = res3.fetch_hash do
-              if v == 100
-                puts "UDP: MSGID: #{n} GUID: #{guid}"
-                v = 0
-              end
-              v = v + 1 unless v == 100
-              pcktdata = { 'udppacket' => {
-                      'guid' => row3["guid"],
-                      'recv_date' => row3["recv_date"],
-                      'udp_dport' => row3["udp_dport"],
-                      'udp_len' => row3["udp_len"],
-                      'udp_sum' => row3["udp_sum"],
-                      'udp_sport' => row3["udp_sport"]
+                if v == 100
+                  puts "UDP: MSGID: #{n} GUID: #{guid}"
+                  v = 0
+                end
+                v = v + 1 unless v == 100
+                pcktdata = { 'udppacket' => {
+                        'guid' => row3["guid"],
+                        'recv_date' => row3["recv_date"],
+                        'udp_dport' => row3["udp_dport"],
+                        'udp_len' => row3["udp_len"],
+                        'udp_sum' => row3["udp_sum"],
+                        'udp_sport' => row3["udp_sport"]
                     }
                 }
                 pcktyaml = pcktdata.to_yaml
