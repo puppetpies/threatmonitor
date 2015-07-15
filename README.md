@@ -19,7 +19,7 @@ Pcaplet - https://github.com/ahobson/ruby-pcap
 
 PCAPRUB - https://github.com/puppetpies/pcaprub - For Interface Realtime capture / dumping to disk ( Comming soon )
 
-Docker Image ( Very soon )
+Docker Image ( https://hub.docker.com/u/puppetpies ( docker pull puppetpies/threatmonitor-suite ) )
 
 Rubygem released 0.1.9 at time of writing ( gem install thm ) https://rubygems.org/gems/thm
 
