@@ -56,5 +56,10 @@ require File.expand_path(File.join(
 	  "../lib/thm/localmachine.rb"))
 
 require File.expand_path(File.join(
+          File.dirname(__FILE__), 
+	  "../lib/thm/fileservices.rb"))
+
+# Versioning information
+require File.expand_path(File.join(
           File.dirname(__FILE__),
 	  "../lib/thm/version.rb"))
