@@ -8,6 +8,7 @@ module Thm
     end
     
     def conf_loader(file="config.rb")
+      file ||= file
       if !File.exists?("#{Dir.home}/.thm/#{file}")
         File.open("#{Dir.home}/.thm/#{file}", 'w') {|n|
           n.write(@fdata)
