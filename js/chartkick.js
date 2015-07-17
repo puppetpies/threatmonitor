@@ -827,4 +827,3 @@
 
   window.Chartkick = Chartkick;
 }(window));
-
