@@ -12,6 +12,13 @@
 require "#{File.dirname(__FILE__)}/lib/thm.rb"
 require "#{File.dirname(__FILE__)}/thm-privileges.rb"
 
+conf = Thm::FileServices.new
+conf.thmhome?
+
+#require File.expand_path(File.join(
+#          File.dirname(__FILE__),
+#          "/lib/thm.rb")
+
 module Thm::Authorization
 
   class Authentication < Thm::DataServices
