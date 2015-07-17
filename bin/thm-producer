@@ -14,10 +14,6 @@ require File.expand_path(File.join(
           File.dirname(__FILE__),
           "../lib/thm.rb"))
 
-#require File.expand_path(File.join(
-#          File.dirname(__FILE__),
-#	 "../config.rb"))
-
 conf = Thm::FileServices.new
 conf.thmhome?
 
