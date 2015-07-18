@@ -23,7 +23,7 @@ require File.expand_path(File.join(
 
 require File.expand_path(File.join(
           File.dirname(__FILE__),
-          "../lib/version.rb"))
+          "../lib/thm/version.rb"))
 
 
 class Sinatra::Base
@@ -95,7 +95,7 @@ module ThmUI extend self
       content_type :html
     end
 	
-    set :title, "Threatmonitor - Packet Analysis Suite #{RELEASE}"
+    set :title, "Threatmonitor - Packet Analysis Suite"
     set :port, 4567
     set :bind, "0.0.0.0"
     # Global helpers
