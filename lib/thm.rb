@@ -16,9 +16,6 @@ require 'guid'
 require 'yaml'
 require 'pcaplet'
 require 'pcaprub' # For Live capture / write
-require File.expand_path(File.join(
-          File.dirname(__FILE__),
-          "../datalayerlight.rb"))
 include Pcap
 
 # TODO
@@ -38,7 +35,12 @@ module Tools
   
 end
 
-# Load Datasources
+# Load Database drivers
+require File.expand_path(File.join(
+          File.dirname(__FILE__),
+          "../lib/thm/datalayerlight.rb"))
+          
+# Load Datasources / Services contains defaults
 require File.expand_path(File.join(
           File.dirname(__FILE__),
           "../lib/thm/dataservices.rb"))
