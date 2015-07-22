@@ -110,10 +110,10 @@ module ThmUI extend self
         :httponly       => true,
         :secure         => production?,
         :expire_after   => 3600, # 1 hour
-	#:views          => File.expand_path(File.expand_path('../../views/', __FILE__)),
-	:views		=> Proc.new { File.join(root, "views") },
-	#:layout_engine  => :slim,
-	:public_folder => File.dirname(__FILE__) + '/bin'
+        #:views          => File.expand_path(File.expand_path('../../views/', __FILE__)),
+        :views		=> Proc.new { File.join(root, "views") },
+        #:layout_engine  => :slim,
+        :public_folder => File.dirname(__FILE__) + '/bin'
 
     enable :method_override
     
@@ -127,10 +127,10 @@ module ThmUI extend self
     # NOTE: Monkey patch Sinatra initialize
     #       If you go to /dashboard without logging in @sessobj it won't have been created
     #       So if you create it objstart! in the Sinatra's initialize your sorted.
-    #       Page requests will come in a @sessobj will always exist and be the same one no headaches 
+    #       Page requests will come in and @sessobj will always exist and be the same one no headaches 
     def initialize(app = nil)
       super()
-      objstart! # Little trick here patch so i can get objstart! out of the box!
+      objstart! # Little trick here patch so i can get @sessobj out of the box!
       @app = app 
       @template_cache = Tilt::Cache.new
       yield self if block_given?
@@ -210,7 +210,7 @@ module ThmUI extend self
         ip_dst = row["ip_dst"].to_s
         location = geoiplookup(ip_dst)
         locfix = location.to_s.gsub("(", "").gsub(")", "") # Yawn
-        if location != nil or location == ""
+        if location != nil or location == "" # You can't have a blank or nil instance_variable
           @gcnt.geocount("#{locfix}")
         end
         rowusrcnt << ["#{ip_dst} #{location}", "#{num2}"]
