@@ -189,9 +189,9 @@ module DatalayerLight
       begin
         request.body = data unless data.empty?
         response = http.request(request)
-        if response.code == 204 # Good response
-          puts "OK"
-        elsif response.code == 200 or response.code == 400 # 200 can be an error in some cases !!
+        if response.code == "204" # Good response
+          # Be quiet
+        elsif response.code == "200" or response.code == "400" # 200 can be an error in some cases !!
           puts "Error code #{response.code}"
         end
       rescue
