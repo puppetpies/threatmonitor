@@ -149,7 +149,7 @@ module DatalayerLight
     require "json"
     require "pp"
   
-    attr_accessor :dbhost, :dbuser, :dbpass, :dbport, :dburl
+    attr_accessor :dbhost, :dbuser, :dbpass, :dbport, :dburl, :dbname
 
     def initialize
       @dbhost = "127.0.0.1"
