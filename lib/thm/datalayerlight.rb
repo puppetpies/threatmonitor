@@ -197,6 +197,7 @@ module DatalayerLight
       rescue
         puts "Error posting data"
       end
+      return response.code
     end
     
     def query(sql, mode="r")
