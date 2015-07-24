@@ -191,7 +191,7 @@ module DatalayerLight
         response = http.request(request)
         if response.code == "204" # Good response
           # Be quiet
-        elsif response.code == "200" or response.code == "400" # 200 can be an error in some cases !!
+        elsif response.code =~ %r=[200,400,500]= # 200 can be an error in some cases !!
           puts "Error code #{response.code}"
         end
       rescue
