@@ -191,13 +191,15 @@ module DatalayerLight
         response = http.request(request)
         if response.code == "204" # Good response
           # Be quiet
+          return response.code
         elsif response.code =~ %r=[200,400,500]= # 200 can be an error in some cases !!
           puts "Error code #{response.code}"
+          return response.code
         end
       rescue
         puts "Error posting data"
+        return "404"
       end
-      return response.code
     end
     
     def query(sql, mode="r")
