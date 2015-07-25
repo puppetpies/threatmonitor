@@ -30,12 +30,45 @@ Date: Fri, 24 Jul 2015 13:05:19 GMT
 
 insert into starbucks,charset=3,useragent=155,host=155,connection=155,acceptencoding=144,accept=149,referer=140,acceptlanguage=135,cookie=98,ifnonematch=12,xclientdata=12,resourcefreshness=4,ifmodifiedsince=18,xrequestedwith=4,origin=3,authorization=1,cachecontrol=4,cachecontrol=4,date=1,pragma=1,location=1,acc=2,contentlength=1,xigcapabilities=28,dnt=64,xclientdata=15,purpose=1,xgeo=1,csp=3 value=0.1
 
-insert into star1,charset=3,useragent=155,host=155 value=0.1
+insert into starbucks purpose=1,xgeo=1,csp=3 value=0.1
+
+CREATE TABLE http_request (
+  guid char(36) not null primary key,
+  charset char(8),
+  useragent string,
+  host char(255),
+  connection string,
+  acceptencoding string,
+  accept string,
+  referer string,
+  acceptlanguage string,
+  cookie string,
+  ifnonematch string,
+  xclientdata string,
+  resourcefreshness string,
+  ifmodifiedsince string,
+  xrequestedwith string,
+  origin string,
+  auth string,
+  cachecontrol string,
+  date string,
+  pragma string,
+  location string,
+  acc string,
+  contentlength int,
+  xigcapabilities string,
+  dnt string,
+  purpose string,
+  xgeo string,
+  csp string
+);
 
 =end
 
 require 'pcaplet'
 require 'getoptlong'
+require 'keycounter'
+
 require File.expand_path(File.join(
           File.dirname(__FILE__),
           "../lib/thm.rb"))
@@ -63,45 +96,10 @@ exception when looping over each packet loop: #<NoMethodError: undefined method 
   
 end
 
-class Keycounter
-
-  # Create / Add to instance variable
-  def keycount(key)
-    key.gsub!(" ", "_") # no spaces or case
-    if !instance_variable_get("@#{key}")
-      instance_variable_set("@#{key}", 1)
-    else
-      instance_variable_set("@#{key}", instance_variable_get("@#{key}") + 1)
-    end
-    puts "Key: #{key} Value: "+instance_variable_get("@#{key}").to_s
-  end
-
-  # Read a single key
-  def keycount_reader(key)
-    key.gsub!(" ", "_") # no spaces or case
-    valnum = instance_variable_get("@#{key}")
-    return valnum
-  end
-
-  # Compile in array with the totals of all instance variables
-  def keycount_compile
-    keycounts = Array.new
-    # You can't really inherit this class as the other class may also contain instance variables
-    # its not really an exact logic this class only works alone.
-    instance_variables.each {|n|
-      t = n.to_s.gsub("@", "")
-      keycounts << ["#{t}", instance_variable_get("#{n}")]
-    }
-    return keycounts
-    keycounts
-  end
-
-end
-
 ARGV[0] = "--help" if ARGV[0] == nil
 
 banner = "\e[1;34mWelcome to Threatmonitor HTTP Series measurements \e[0m\ \n"
-banner << "\e[1;34m=================================================\e[0m\ \n"
+banner << "\e[1;34m=================================================\e[0m\ \n\n"
 
 opts = GetoptLong.new(
   [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
@@ -148,6 +146,15 @@ end
 
 puts banner
 
+def text_highlighter(text)
+  keys = ["Linux", "Java", "Android", "iPhone", "Mobile", "Chrome", "Safari", "Mozilla", "Gecko", "AppleWebKit"]
+  cpicker = [2,3,4,1,3,5]
+  keys.each {|n|
+    text.gsub!("#{n}", "\e[4;3#{cpicker[rand(cpicker.size)]}m#{n}\e[0m\ ".strip)
+  }
+  return text
+end
+
 def makeurl(data)
   hdrs = data
   hostn, requestn = ""
@@ -164,7 +171,7 @@ end
 def request_filter(mtable, data, keysamples=500)
   lkey, rkey = ""
   q = "#{mtable},"
-  puts "Influx Data: "
+  puts "\e[4;36mInflux Data:\e[0m\ "
   t = 0
   data.each_line {|n|
     unless n.strip == ""
@@ -211,7 +218,7 @@ end
 
 # InfluxDB Connection info
 sd = DatalayerLight::InfluxDB.new
-sd.dbhost = "172.17.0.3"
+sd.dbhost = "172.17.0.4"
 sd.dbname = "threatmonitor"
 if defined?(@startnewtable)
   # Initialize new table for measurements
@@ -225,37 +232,40 @@ end
 # Regexp strings first currently excludes POST Data
 HTTP_METHODS_REGEXP = %r=^GET |^HEAD |^PUT |^TRACE |^CONNECT |^OPTIONS |^DELETE |^PROPFIND |^PROPPATCH |^MKCOL |^COPY |^MOVE |^LOCK |^UNLOCK =
 HTTP_METHODS_REGEXP_RESPONSE = %r=^(HTTP\/.*)$=
-
 httpdump = Pcaplet.new("-s 1500 -n -i #{@interface}")
 HTTP_REQUEST  = Pcap::Filter.new('tcp dst port 80', httpdump.capture)
 HTTP_RESPONSE = Pcap::Filter.new('tcp src portrange 1024-65535', httpdump.capture)
-
 httpdump.add_filter(HTTP_REQUEST | HTTP_RESPONSE)
 httpdump.each_packet {|pkt|
   begin
     data = pkt.tcp_data.to_s
+    data_highlight = text_highlighter(data)
     case pkt
     when HTTP_REQUEST
       if data =~ HTTP_METHODS_REGEXP
         path = $1
         host = pkt.dst.to_s
-        host << ":#{pkt.dport}"
-        s = "#{pkt.src}:#{pkt.sport} > GET http://#{host}#{path}".gsub("GET", "\e[1;36mGET\e[0m")
-        puts "\e[1;31mRequest Data: #{data} \e[0m\ "
+        host << ":\e[1;33m#{pkt.dport}\e[0m\ "
+        s = "\e[1;33m#{pkt.src}:\e[1;31m#{pkt.sport}\e[0m\ > GET \e[1;33mhttp://#{host}#{path}\e[1;32mHTTP/1.1\e[0m ".gsub("GET", "\e[1;36mGET\e[0m")
+        puts "\e[4;36mRequest Data:\e[0m\ \n\e[0;32m#{data_highlight} \e[0m\ "
         makeurl(data)
         f = request_filter("#{@mtable}", data)
         r = sd.query("#{f}", 'w')
-        puts "Response Code: #{r}"
+        print "Response Code: "
         if r == "404" or r == "500"
+          print "\e[1;35m #{r} \e[0m\ \n"
           log_errors("/tmp/thm-httpseries-errors.log", "Code:#{r} - #{f}") # Catch them all
+        elsif r == "404"
+          puts "\e[1;35m Database not running \e[0m\ \n" 
+        else
+          puts "#{r}\n"
         end
       end
     when HTTP_RESPONSE
       if data =~ HTTP_METHODS_REGEXP_RESPONSE
         status = $1
         s = "#{pkt.dst}:#{pkt.dport} < #{status}"
-        puts "\e[1;32mResponse Data: #{data} \e[0m\ "
-        #f = filterdata("starbucks", data)
+        puts "\e[1;31mResponse Data: #{data} \e[0m\ "
       end
     end
   rescue nil::NilClass => e
