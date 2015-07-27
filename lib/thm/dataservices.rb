@@ -13,9 +13,10 @@ module Thm
     #  obj.mqconnect
     #  obj.dbconnect
     
-    attr_accessor :datastore, :mqhost, :mquser, :mqpass, :mqvhost, :dbhost, :dbuser, :dbpass, :dbname, :queueprefix, :tblname_ippacket, :tblname_tcppacket, :tblname_udppacket
+    attr_accessor :autocommit, :datastore, :mqhost, :mquser, :mqpass, :mqvhost, :dbhost, :dbuser, :dbpass, :dbname, :queueprefix, :tblname_ippacket, :tblname_tcppacket, :tblname_udppacket
     
     def initialize
+      @autocommit = false
       @datastore = "monetdb"
       @mqhost = "127.0.0.1"
       @mquser = "traffic"
@@ -54,7 +55,7 @@ module Thm
       @conn.username = @dbuser
       @conn.password = @dbpass
       @conn.dbname = @dbname
-      @conn.autocommit = false
+      @conn.autocommit = @autocommit
       begin
         @conn.connect
       rescue Errno::ECONNREFUSED
