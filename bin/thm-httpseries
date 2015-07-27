@@ -68,6 +68,7 @@ CREATE TABLE http_request (
 require 'pcaplet'
 require 'getoptlong'
 require 'keycounter'
+require 'guid'
 
 require File.expand_path(File.join(
           File.dirname(__FILE__),
@@ -77,6 +78,40 @@ conf = Thm::FileServices.new
 conf.thmhome?
 
 include Thm::Defaults
+
+class Keycounter
+
+  def keycount_createtablethm
+    fieldlst = Array.new
+    if File.exists?("/tmp/thmreadtable.txt")
+      File.open("/tmp/thmreadtable.txt", 'r') {|n|
+        n.each_line {|l|
+          fieldlst << ["#{l}"]
+        }
+      }
+    end
+    sql = "CREATE TABLE http_request (\n"
+    sql << "guid char(36),\n"
+    instance_variables.each {|n|
+      t = n.to_s.gsub("@", "")
+      fieldlst << ["#{t}"]
+    }
+    fieldlst.each {|n|
+      sql << "#{n} string,\n"
+    }
+    sql = sql[0..sql.size - 2]
+    sql << "\n);\n"
+    b = fieldlst.uniq.sort
+    pp b
+    File.open("/tmp/thmreadtable.txt", 'w') {|n|
+      b.each {|j|
+        n.puts(j)
+      }
+    }
+    puts "\e[4;36mCreate table:\e[0m\ \n #{sql}"
+  end
+  
+end
 
 class NilClass
 
@@ -131,8 +166,9 @@ opts.each do |opt, arg|
     when '--pcapfile'
       @pcapfile = arg
     when '--countheaders'
-      @countheaders = 1
+      @countheaders = true
       @k = Keycounter.new
+      @k.verbose = false
       @f = 0
       puts "Counters Enabled"
     when '--mtable'
@@ -149,13 +185,19 @@ puts banner
 def text_highlighter(text)
   keys = ["Linux", "Java", "Android", "iPhone", "Mobile", "Chrome", 
           "Safari", "Mozilla", "Gecko", "AppleWebKit", "Windows", 
-          "MSIE", "Win64", "Trident", "wispr",
-          "AMD64", "Darwin", "Macintosh", "Mac OS X"]
+          "MSIE", "Win64", "Trident", "wispr", "PHPSESSID", "JSESSIONID",
+          "AMD64", "Darwin", "Macintosh", "Mac OS X", "Dalvik"]
   cpicker = [2,3,4,1,7,5,6]
   keys.each {|n|
-    text.gsub!("#{n}", "\e[4;3#{cpicker[rand(cpicker.size)]}m#{n}\e[0m\ ".strip)
+    text.gsub!("#{n}", "\e[4;3#{cpicker[rand(cpicker.size)]}m#{n}\e[0m\ \e[0;32m".strip)
   }
   return text
+end
+
+def log_errors(file, data)
+  File.open("#{file}", 'a') {|n|
+    n.puts("#{data}")
+  }
 end
 
 def makeurl(data)
@@ -171,11 +213,14 @@ def makeurl(data)
   puts "\e[1;37mURL: http://#{hostn}#{requestn} \e[0m\ "
 end
 
-def request_filter(mtable, data, keysamples=500)
+def request_filter(mtable, data, keysamples=2000)
   lkey, rkey = ""
   q = "#{mtable},"
-  puts "\e[4;36mInflux Data:\e[0m\ "
   t = 0
+  sql = "INSERT INTO http_request (guid,"
+  cols, vals = String.new, String.new
+  guid = Guid.new
+  vals = "'#{guid}',"
   data.each_line {|n|
     unless n.strip == ""
       if t > 0 # Don't processes GET / POST Line
@@ -186,7 +231,9 @@ def request_filter(mtable, data, keysamples=500)
           rkey = n.split(":")[1].to_s.gsub(",", "").gsub(";", "").gsub("=", "").strip
           rkeyenc = URI.encode(rkey)
         end
-        if rkeyenc.strip != "" or lkey.strip != ""
+        if rkeyenc.strip != "" or lkey.strip != "" or lkey.strip == "range"
+          cols << "#{lkey},"
+          vals << "'#{rkeyenc}',"
           q << "#{lkey}=#{rkeyenc},"
         end
         # Keycounter / HTTP Headers counter
@@ -196,9 +243,11 @@ def request_filter(mtable, data, keysamples=500)
             if lkey != ""
               @k.keycount("#{lkey}")
               @f = @f + 1
+              puts "Sample ##{@f} of##{keysamples}" 
             end
           else
             pp @k.keycount_compile
+            @k.keycount_createtablethm
             puts "Real exit..."
             exit
           end
@@ -209,14 +258,22 @@ def request_filter(mtable, data, keysamples=500)
   }
   q = q[0..q.size - 2] # Detract comma
   q << " value=0.1"
+  begin
+    cols = "#{cols[0..cols.size - 2]}) "
+    vals = "#{vals[0..vals.size - 2]});"
+    sql = "#{sql}#{cols}VALUES (#{vals}"
+    if cols.strip != ""
+      ires = @sessobj.query("#{sql}")
+    else
+      log_errors("/tmp/thm-sql-errors.log", "SQL Error - #{sql}") # Catch them all
+    end
+  rescue => e
+    pp e
+  end
+  puts "\e[4;36mStructured Query:\e[0m\ #{sql} \e[4;36mResult:\e[0m\ #{ires}"
+  puts "\e[4;36mInflux Data:\e[0m\ "
   puts q
   return q
-end
-
-def log_errors(file, data)
-  File.open("#{file}", 'a') {|n|
-    n.puts("#{data}")
-  }
 end
 
 def geoiplookup(ip)
@@ -242,10 +299,12 @@ sd.dbname = "threatmonitor"
 
 @sessobj = Thm::Producer.new
 @sessobj.datastore = DATASTORE
+@sessobj.debug = false
+@sessobj.autocommit = true
 @sessobj.dbhost = DBHOST
 @sessobj.dbuser = DBUSER
 @sessobj.dbpass = DBPASS
-@sessobj.dbname = DBNAME     
+@sessobj.dbname = DBNAME
 @sessobj.dbconnect
 if defined?(@startnewtable)
   # Initialize new table for measurements
@@ -294,7 +353,7 @@ httpdump.each_packet {|pkt|
       if data =~ HTTP_METHODS_REGEXP_RESPONSE
         status = $1
         s = "#{pkt.dst}:#{pkt.dport} < #{status}"
-        puts "\e[1;31mResponse Data: #{data} \e[0m\ "
+        puts "\e[1;31mResponse Data: #{data_highlight} \e[0m\ "
       end
     end
   rescue nil::NilClass => e
