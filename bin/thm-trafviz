@@ -5,7 +5,7 @@
 #
 # Description: Threatmonitor HTTP Time Series
 #
-# Analyze HTTP Traffic using InfluxDB
+# Analyze HTTP Traffic using InfluxDB / Traffic Visualizer
 #
 ########################################################################
 
@@ -245,13 +245,14 @@ def request_filter(mtable, data, keysamples=2000)
     unless n.strip == ""
       if t > 0 # Don't processes GET / POST Line
         lkey = n.split(":")[0].downcase.gsub("-", "").to_s.strip
+        #puts "LKEY: #{lkey}"
         if lkey == "cookie"
           rkeyenc = "cookieommited"
         else
           rkey = n.split(":")[1].to_s.gsub(",", "").gsub(";", "").gsub("=", "").strip
           rkeyenc = URI.encode(rkey)
         end
-        if rkey.strip != "" or lkey.strip != "" or lkey.strip != "range"
+        if ((rkey.strip != "" or lkey.strip != "") and (lkey.strip != "range"))
           cols << "#{lkey},"
           vals << "'#{rkey}',"
           q << "#{lkey}=#{rkey},"
