@@ -133,13 +133,13 @@ end
 
 ARGV[0] = "--help" if ARGV[0] == nil
 
-banner = "\e[1;34mWelcome to Threatmonitor HTTP Series measurements \e[0m\ \n"
+banner = "\e[1;34mWelcome to Threatmonitor HTTP Traffic Visualizer \e[0m\ \n"
 banner << "\e[1;34m=================================================\e[0m\ \n\n"
 
 opts = GetoptLong.new(
   [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
   [ '--countheaders', '-c', GetoptLong::NO_ARGUMENT ],
-  [ '--mtable', '-m', GetoptLong::REQUIRED_ARGUMENT],
+  [ '--mtable', '-m', GetoptLong::OPTIONAL_ARGUMENT],
   [ '--interface', '-i', GetoptLong::REQUIRED_ARGUMENT],
   [ '--startnewtable', '-s', GetoptLong::NO_ARGUMENT]
 )
@@ -151,13 +151,13 @@ opts.each do |opt, arg|
 -h, --help:
    show help
    
--c, --countheaders - Count HTTP Header types [ NO_ARGUMENT ]
+-c, --countheaders - Count HTTP Header types ( Builds a create table statement )[ NO_ARGUMENT ]
 
--m, --mtable - Measurements Table to store data [ REQUIRED_ARGUMENT ]
+-m, --mtable - Measurements Table to store series data [ OPTIONAL_ARGUMENT ]
 
 -i, --interface -- Network Interface to collect measurements from [ REQUIRED_ARGUMENT ]
 
--s, --startnewtable - Intialize table for new captures
+-s, --startnewtable - Intialize table for new captures in InfluxDB
 
 ]
       puts banner
@@ -168,7 +168,6 @@ opts.each do |opt, arg|
     when '--countheaders'
       @countheaders = true
       @k = Keycounter.new
-      @k.verbose = false
       @f = 0
       puts "Counters Enabled"
     when '--mtable'
@@ -200,7 +199,25 @@ def log_errors(file, data)
   }
 end
 
+# Check if a request isn't just a GET line without headers
+# Not sure if this is valid HTTP
+def request_valid?(data)
+  ln = 0
+  data.each_line {|l|
+    ln += 1
+  }
+  if ln > 1
+    return true
+  else
+    puts "\e[1;31mCatch GET's without header information \e[0m\ "
+    return false # Due to single GET Requests to no headers 
+  end
+end
+
 def makeurl(data)
+  if !request_valid?(data)
+    return false
+  end
   hdrs = data
   hostn, requestn = ""
   hdrs.each_line {|n|
@@ -214,6 +231,9 @@ def makeurl(data)
 end
 
 def request_filter(mtable, data, keysamples=2000)
+  if !request_valid?(data)
+    return false
+  end
   lkey, rkey = ""
   q = "#{mtable},"
   t = 0
@@ -231,10 +251,10 @@ def request_filter(mtable, data, keysamples=2000)
           rkey = n.split(":")[1].to_s.gsub(",", "").gsub(";", "").gsub("=", "").strip
           rkeyenc = URI.encode(rkey)
         end
-        if rkeyenc.strip != "" or lkey.strip != "" or lkey.strip == "range"
+        if rkey.strip != "" or lkey.strip != "" or lkey.strip != "range"
           cols << "#{lkey},"
-          vals << "'#{rkeyenc}',"
-          q << "#{lkey}=#{rkeyenc},"
+          vals << "'#{rkey}',"
+          q << "#{lkey}=#{rkey},"
         end
         # Keycounter / HTTP Headers counter
         if @countheaders == true
@@ -258,6 +278,7 @@ def request_filter(mtable, data, keysamples=2000)
   }
   q = q[0..q.size - 2] # Detract comma
   q << " value=0.1"
+  # SQL for Datastore
   begin
     cols = "#{cols[0..cols.size - 2]}) "
     vals = "#{vals[0..vals.size - 2]});"
@@ -271,9 +292,12 @@ def request_filter(mtable, data, keysamples=2000)
     pp e
   end
   puts "\e[4;36mStructured Query:\e[0m\ #{sql} \e[4;36mResult:\e[0m\ #{ires}"
-  puts "\e[4;36mInflux Data:\e[0m\ "
-  puts q
-  return q
+  # InfluxDB string for measurements / time series
+  if defined?(@mtable)
+    puts "\e[4;36mInflux Data:\e[0m\ "
+    puts q
+    return q
+  end
 end
 
 def geoiplookup(ip)
@@ -293,10 +317,10 @@ def geoiplookup(ip)
 end
 
 # InfluxDB Connection info
-sd = DatalayerLight::InfluxDB.new
-sd.dbhost = "172.17.0.3"
-sd.dbname = "threatmonitor"
-
+tsd = DatalayerLight::InfluxDB.new
+tsd.dbhost = "172.17.0.3"
+tsd.dbname = "threatmonitor"
+# Connect to Datastore
 @sessobj = Thm::Producer.new
 @sessobj.datastore = DATASTORE
 @sessobj.debug = false
@@ -306,13 +330,15 @@ sd.dbname = "threatmonitor"
 @sessobj.dbpass = DBPASS
 @sessobj.dbname = DBNAME
 @sessobj.dbconnect
-if defined?(@startnewtable)
-  # Initialize new table for measurements
-  j = sd.query("#{@mtable},charset=3,useragent=155,host=155,connection=155,acceptencoding=144,accept=149,referer=140,acceptlanguage=135,cookie=98,ifnonematch=12,xclientdata=12,resourcefreshness=4,ifmodifiedsince=18,xrequestedwith=4,origin=3,authorization=1,cachecontrol=4,cachecontrol=4,date=1,pragma=1,location=1,acc=2,contentlength=1,xigcapabilities=28,dnt=64,xclientdata=15,purpose=1,xgeo=1,csp=3 value=0.1", 'w')
-  if j == "204"
-    puts "New table #{@mtable} created ..."
-  else
-    puts "Something when wrong error code #{j}"
+if defined?(@mtable)
+  if defined?(@startnewtable)
+    # Initialize new table for measurements
+    j = tsd.query("#{@mtable},charset=3,useragent=155,host=155,connection=155,acceptencoding=144,accept=149,referer=140,acceptlanguage=135,cookie=98,ifnonematch=12,xclientdata=12,resourcefreshness=4,ifmodifiedsince=18,xrequestedwith=4,origin=3,authorization=1,cachecontrol=4,cachecontrol=4,date=1,pragma=1,location=1,acc=2,contentlength=1,xigcapabilities=28,dnt=64,xclientdata=15,purpose=1,xgeo=1,csp=3 value=0.1", 'w')
+    if j == "204"
+      puts "New table #{@mtable} created ..."
+    else
+      puts "Something when wrong error code #{j}"
+    end
   end
 end
 # Regexp strings first currently excludes POST Data
@@ -337,16 +363,20 @@ httpdump.each_packet {|pkt|
         puts "\e[4;36mGeo Location:\e[0m\ \n\e[0;35m#{geo} \e[0m\ "
         puts "\e[4;36mRequest Data:\e[0m\ \n\e[0;32m#{data_highlight} \e[0m\ "
         makeurl(data)
+        # Process data and prepare then send elsewhere
         f = request_filter("#{@mtable}", data)
-        r = sd.query("#{f}", 'w')
-        print "Response Code: "
-        if r == "404" or r == "500"
-          print "\e[1;35m #{r} \e[0m\ \n"
-          log_errors("/tmp/thm-httpseries-errors.log", "Code:#{r} - #{f}") # Catch them all
-        elsif r == "404"
-          puts "\e[1;35m Database not running \e[0m\ \n" 
-        else
-          puts "#{r}\n"
+        # Store data into InfluxDB API
+        if defined?(@mtable)
+          r = tsd.query("#{f}", 'w')
+          print "Response Code: "
+          if r == "404" or r == "500"
+            print "\e[1;35m #{r} \e[0m\ \n"
+            log_errors("/tmp/thm-httpseries-errors.log", "Code:#{r} - #{f}") # Catch them all
+          elsif r == "404"
+            puts "\e[1;35m Database not running \e[0m\ \n" 
+          else
+            puts "#{r}\n"
+          end
         end
       end
     when HTTP_RESPONSE
