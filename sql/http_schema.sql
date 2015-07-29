@@ -62,6 +62,7 @@ xnewsappsosplatform string,
 xolduid string,
 xplaybacksessionid string,
 xrequestedwith string,
-xretrycount string
+xretrycount string,
+xwapprofile string
 );
 
