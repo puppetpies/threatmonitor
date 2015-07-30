@@ -4,8 +4,8 @@ module Thm #:nodoc:
 
     MAJOR = 0
     MINOR = 2
-    TINY = 2
-    CODENAME = "Deedrah"
+    TINY = 3
+    CODENAME = "Cosmic Voids"
 
     STRING = [MAJOR, MINOR, TINY].join('.')
 
