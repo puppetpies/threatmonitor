@@ -1,7 +1,7 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-VERSION = "0.2.2"
+VERSION = "0.2.3"
 
 Gem::Specification.new do |spec|
   spec.name          = "thm"
@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = "brianh6854@googlemail.com"
   spec.description   = "Threatmonitor - Packet Capture / Analysis Suite"
   spec.summary       = "Packet Data Analysis"
-  spec.executables = ["thm-consumer", "thm-producer", "thm-session", "thm-useradmin", "thm-pcap"]
+  spec.executables = ["thm-consumer", "thm-producer", "thm-session", "thm-useradmin", "thm-pcap", "thm-trafviz"]
   spec.homepage      = "https://github.com/puppetpies/threatmonitor"
   spec.requirements  = "libpcap"
   spec.license       = "MIT"
@@ -25,6 +25,7 @@ Gem::Specification.new do |spec|
     "bin/thm-session",
     "bin/thm-useradmin",
     "bin/thm-pcap",
+    "bin/thm-trafviz",
     "thm-privileges.rb",
     "service_definitions.csv",
     "lib/thm.rb",
