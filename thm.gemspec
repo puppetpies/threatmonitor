@@ -70,5 +70,5 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "chartkick", "~> 1.3"
   spec.add_runtime_dependency "sinatra", "~> 1.4"
   spec.add_runtime_dependency "slim", "~> 3.0"
-
+  spec.add_runtime_dependency "keycounter", "~> 0.0.7"
 end
