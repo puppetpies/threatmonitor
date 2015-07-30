@@ -46,6 +46,7 @@ Gem::Specification.new do |spec|
     "sql/geoipdata-monetdb.sql",
     "sql/threatmonitor-monetdb.sql",
     "sql/threatmonitor-mysql.sql",
+    "sql/threatmonitor-http.sql",
     "views/authenticate.slim",
     "views/dashboard.erb",
     "views/logout.slim"
