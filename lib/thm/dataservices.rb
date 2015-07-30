@@ -74,3 +74,5 @@ module Thm
   end
 
 end
+
+require_relative 'dataservices/trafviz/trafviz.rb'
