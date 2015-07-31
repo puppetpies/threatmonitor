@@ -112,34 +112,17 @@ end
 
 puts banner
 
-def geoiplookup(ip)
-  query = "SELECT continent_name, country_name FROM geoipdata_ipv4blocks_country a JOIN geoipdata_locations_country b ON (a.geoname_id = b.geoname_id) WHERE network LIKE '#{ip.split(".")[0]}.#{ip.split(".")[1]}.%' GROUP BY b.continent_name, b.country_name LIMIT 1;"
-  resusrcnt = @sessobj.query("#{query}")
-  while row = resusrcnt.fetch_hash do
-    continent_name = row["continent_name"].to_s
-    country_name = row["country_name"].to_s
-    #if continent_name == ""
-      cname = "(#{country_name})"
-    #else
-    #  cname = "(#{continent_name})"
-    #end
-  end
- # geoipcount(
-  return cname
-end
-
-# Connect to Datastore
-@sessobj = Thm::Producer.new
-@sessobj.datastore = DATASTORE
-@sessobj.debug = false
-@sessobj.autocommit = true
-@sessobj.dbhost = DBHOST
-@sessobj.dbuser = DBUSER
-@sessobj.dbpass = DBPASS
-@sessobj.dbname = DBNAME
-@sessobj.dbconnect
-
 tv = Thm::DataServices::Trafviz.new
+# Connect to Datastore
+gloc = Thm::DataServices::Geolocation.new
+gloc.datastore = DATASTORE
+gloc.debug = false
+gloc.autocommit = true
+gloc.dbhost = DBHOST
+gloc.dbuser = DBUSER
+gloc.dbpass = DBPASS
+gloc.dbname = DBNAME
+gloc.dbconnect
 
 # Regexp strings first currently excludes POST Data
 HTTP_METHODS_REGEXP = %r=^GET |^HEAD |^PUT |^TRACE |^CONNECT |^OPTIONS |^DELETE |^PROPFIND |^PROPPATCH |^MKCOL |^COPY |^MOVE |^LOCK |^UNLOCK =
@@ -159,7 +142,7 @@ httpdump.each_packet {|pkt|
         host = pkt.dst.to_s
         host << ":\e[1;33m#{pkt.dport}\e[0m\ "
         s = "\e[1;33m#{pkt.src}:\e[1;31m#{pkt.sport}\e[0m\ > GET \e[1;33mhttp://#{host}\e[1;32mHTTP/1.1\e[0m ".gsub("GET", "\e[1;36mGET\e[0m")
-        geo = geoiplookup(host.split(":")[0])
+        geo = gloc.geoiplookup(host.split(":")[0])
         puts "\e[4;36mGeo Location:\e[0m\ \n\e[0;35m#{geo} \e[0m\ "
         puts "\e[4;36mRequest Data:\e[0m\ \n\e[0;32m#{data_highlight} \e[0m\ "
         tv.makeurl(data)
@@ -167,7 +150,7 @@ httpdump.each_packet {|pkt|
         query_return_sql = tv.request_filter(data)
         # Store data into InfluxDB API Capture if @mtable exists else Datastore
         begin
-          ires = @sessobj.query("#{query_return_sql}")
+          ires = gloc.query("#{query_return_sql}")
           puts "\e[4;36mStructured Query:\e[0m\ #{query_return_sql} \e[4;36mResult:\e[0m\ #{ires}"
         rescue
           Tools::log_errors("/tmp/thm-sql-errors.log", "SQL Error - #{query_return_sql}") # Catch them all
