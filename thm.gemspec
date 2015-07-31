@@ -35,6 +35,8 @@ Gem::Specification.new do |spec|
     "lib/thm/localmachine.rb",
     "lib/thm/producer.rb",
     "lib/thm/version.rb",
+    "lib/thm/dataservices/geolocation/geolocation.rb",
+    "lib/thm/dataservices/trafviz/trafviz.rb",
     "js/jquery.min.js",
     "js/chartkick.js",
     "js/JSXTransformer.js",
@@ -71,5 +73,5 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "chartkick", "~> 1.3"
   spec.add_runtime_dependency "sinatra", "~> 1.4"
   spec.add_runtime_dependency "slim", "~> 3.0"
-  spec.add_runtime_dependency "keycounter", "~> 0.0.7"
+  spec.add_runtime_dependency "keycounter", "~> 0.0"
 end
