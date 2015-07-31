@@ -24,7 +24,7 @@ module Thm::Authorization
     
     def initialize
       super
-      @debug = 1
+      @debug = true
     end
     
     def login(username, password)

@@ -21,7 +21,7 @@ module Thm::Authorization
     
     def initialize
       super
-      @debug = 1
+      @debug = true
     end
     
     def setup_privileges(name, obj)
