@@ -112,12 +112,6 @@ end
 
 puts banner
 
-def log_errors(file, data)
-  File.open("#{file}", 'a') {|n|
-    n.puts("#{data}")
-  }
-end
-
 def geoiplookup(ip)
   query = "SELECT continent_name, country_name FROM geoipdata_ipv4blocks_country a JOIN geoipdata_locations_country b ON (a.geoname_id = b.geoname_id) WHERE network LIKE '#{ip.split(".")[0]}.#{ip.split(".")[1]}.%' GROUP BY b.continent_name, b.country_name LIMIT 1;"
   resusrcnt = @sessobj.query("#{query}")
@@ -176,7 +170,7 @@ httpdump.each_packet {|pkt|
           ires = @sessobj.query("#{query_return_sql}")
           puts "\e[4;36mStructured Query:\e[0m\ #{query_return_sql} \e[4;36mResult:\e[0m\ #{ires}"
         rescue
-          log_errors("/tmp/thm-sql-errors.log", "SQL Error - #{query_return_sql}") # Catch them all
+          Tools::log_errors("/tmp/thm-sql-errors.log", "SQL Error - #{query_return_sql}") # Catch them all
         end
       end
     when HTTP_RESPONSE
