@@ -33,6 +33,7 @@ module Thm
       end
     end
 
+    # Filter request data and build query
     def request_filter(data, keysamples=2000)
       if !request_valid?(data)
         return false
