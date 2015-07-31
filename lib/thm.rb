@@ -30,6 +30,12 @@ module Tools
     def guid
       guid = Guid.new # Generate GUID
     end
+
+    def log_errors(file, data)
+      File.open("#{file}", 'a') {|n|
+        n.puts("#{data}")
+      }
+    end
   
   end
   
