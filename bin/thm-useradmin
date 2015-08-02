@@ -23,9 +23,21 @@ trap("INT") {
   exit
 }
 
+conf = Thm::FileServices.new
+conf.thmhome?
+
+include Thm::Defaults
+
 obj = Thm::Authorization::Privileges.new
-obj.datastore = "monetdb"
+obj.datastore = DATASTORE
+obj.debug = false
+obj.autocommit = true
+obj.dbhost = DBHOST
+obj.dbuser = DBUSER
+obj.dbpass = DBPASS
+obj.dbname = DBNAME
 obj.dbconnect
+
 if obj.user_exists?("admin") == true
   # Menu
   while buf = Readline.readline("\e[1;32m\Threatmonitor>\e[0m\ ", true)
