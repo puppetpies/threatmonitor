@@ -15,7 +15,7 @@ module Thm
         }
       end
       begin
-        if loadswitch == true
+        if loadswitch == true # So original backup config doesn't change your settings
           require Dir.home+"/.thm/#{file}"
         end
        rescue
