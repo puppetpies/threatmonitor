@@ -12,6 +12,7 @@
 require 'pcaplet'
 require 'getoptlong'
 require 'keycounter'
+require 'walltime'
 
 require File.expand_path(File.join(
           File.dirname(__FILE__),
@@ -133,6 +134,7 @@ httpdump = Pcaplet.new("-s 1500 -n -i #{@interface}")
 HTTP_REQUEST  = Pcap::Filter.new('tcp dst port 80', httpdump.capture)
 HTTP_RESPONSE = Pcap::Filter.new('tcp src portrange 1024-65535', httpdump.capture)
 httpdump.add_filter(HTTP_REQUEST | HTTP_RESPONSE)
+
 httpdump.each_packet {|pkt|
   begin
     data = pkt.tcp_data.to_s
@@ -140,6 +142,8 @@ httpdump.each_packet {|pkt|
     case pkt
     when HTTP_REQUEST
       if data =~ HTTP_METHODS_REGEXP
+        stwt = Stopwatch.new
+        stwt.watch('start')
         path = $1
         host = pkt.dst.to_s
         host << ":\e[1;33m#{pkt.dport}\e[0m\ "
@@ -157,12 +161,18 @@ httpdump.each_packet {|pkt|
         rescue
           Tools::log_errors("/tmp/thm-sql-errors.log", "SQL Error - #{query_return_sql}") # Catch them all
         end
+        stwt.watch('stop')
+        stwt.print_stats
       end
     when HTTP_RESPONSE
       if data =~ HTTP_METHODS_REGEXP_RESPONSE
+        stwt = Stopwatch.new
+        stwt.watch('start')
         status = $1
         s = "#{pkt.dst}:#{pkt.dport} < #{status}"
         puts "\e[1;31mResponse Data: #{data_highlight} \e[0m\ "
+        stwt.watch('stop')
+        stwt.print_stats
       end
     end
   rescue => e
