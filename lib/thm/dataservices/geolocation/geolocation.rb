@@ -5,7 +5,7 @@ module Thm
     attr_writer :geodebug
     
     def initialize
-      @geodebug = true
+      @geodebug = false
     end
 
     def geoiplookup(ip)
