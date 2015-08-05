@@ -77,14 +77,15 @@ exception when looping over each packet loop: #<NoMethodError: undefined method 
 end
 
 ARGV[0] = "--help" if ARGV[0] == nil
-
+@debug = false
 banner = "\e[1;34mWelcome to Threatmonitor HTTP Traffic Visualizer \e[0m\ \n"
 banner << "\e[1;34m=================================================\e[0m\ \n\n"
 
 opts = GetoptLong.new(
   [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
   [ '--countheaders', '-c', GetoptLong::NO_ARGUMENT ],
-  [ '--interface', '-i', GetoptLong::REQUIRED_ARGUMENT]
+  [ '--interface', '-i', GetoptLong::REQUIRED_ARGUMENT],
+  [ '--debug', '-d', GetoptLong::NO_ARGUMENT ],
 )
 
 opts.each do |opt, arg|
@@ -98,6 +99,8 @@ opts.each do |opt, arg|
 
 -i, --interface -- Network Interface to collect measurements from [ REQUIRED_ARGUMENT ]
 
+-d --debug
+
 ]
       puts banner
       puts helper
@@ -107,6 +110,8 @@ opts.each do |opt, arg|
       @k = Keycounter.new
       @f = 0
       puts "Counters Enabled"
+    when '--debug'
+      @debug = true
     when '--interface'
       @interface = arg
   end
@@ -147,7 +152,7 @@ httpdump.each_packet {|pkt|
         path = $1
         host = pkt.dst.to_s
         host << ":\e[1;33m#{pkt.dport}\e[0m\ "
-        s = "\e[1;33m#{pkt.src}:\e[1;31m#{pkt.sport}\e[0m\ > GET \e[1;33mhttp://#{host}\e[1;32mHTTP/1.1\e[0m ".gsub("GET", "\e[1;36mGET\e[0m")
+        s = "\e[1;33m#{pkt.src}:\e[1;31m#{pkt.sport}\e[0m\ > GET \e[1;33mhttp://#{host}\e[1;32mHTTP/1.1\e[0m "
         geo = gloc.geoiplookup(host.split(":")[0])
         puts "\e[4;36mGeo Location:\e[0m\ \n\e[0;35m#{geo} \e[0m\ "
         puts "\e[4;36mRequest Data:\e[0m\ \n\e[0;32m#{data_highlight} \e[0m\ "
@@ -157,7 +162,9 @@ httpdump.each_packet {|pkt|
         # Store data into InfluxDB API Capture if @mtable exists else Datastore
         begin
           ires = gloc.query("#{query_return_sql}")
-          puts "\e[4;36mStructured Query:\e[0m\ #{query_return_sql} \e[4;36mResult:\e[0m\ #{ires}"
+          if @debug == true
+            puts "\e[4;36mStructured Query:\e[0m\ #{query_return_sql} \e[4;36mResult:\e[0m\ #{ires}"
+          end
         rescue
           Tools::log_errors("/tmp/thm-sql-errors.log", "SQL Error - #{query_return_sql}") # Catch them all
         end
@@ -178,5 +185,5 @@ httpdump.each_packet {|pkt|
   rescue => e
     puts e
   end
-  puts s if s
+  puts s.gsub("GET", "\e[1;36mGET\e[0m") if s
 }
