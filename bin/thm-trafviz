@@ -139,7 +139,6 @@ httpdump = Pcaplet.new("-s 1500 -n -i #{@interface}")
 HTTP_REQUEST  = Pcap::Filter.new('tcp dst port 80', httpdump.capture)
 HTTP_RESPONSE = Pcap::Filter.new('tcp src portrange 1024-65535', httpdump.capture)
 httpdump.add_filter(HTTP_REQUEST | HTTP_RESPONSE)
-
 httpdump.each_packet {|pkt|
   begin
     data = pkt.tcp_data.to_s
@@ -185,5 +184,5 @@ httpdump.each_packet {|pkt|
   rescue => e
     puts e
   end
-  puts s.gsub("GET", "\e[1;36mGET\e[0m") if s
+  puts s.gsub("GET", "\e[1;36mGET\e[0m").gsub("POST", "\e[1;36mPOST\e[0m") if s
 }
