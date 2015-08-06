@@ -68,6 +68,6 @@ Import the schema from the SQL provided now moved to sql/
 
 I've now included MySQL Database support also however if your going to create big data sets i think i would use MonetDB
 
-![Dashboard Other](https://raw.githubusercontent.com/puppetpies/threatmonitor/master/screenshot-2.jpg)
+![Dashboard Other](https://raw.githubusercontent.com/puppetpies/threatmonitor/master/screenshot-4.jpg)
 
 Have fun !
