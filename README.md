@@ -70,7 +70,7 @@ I've now included MySQL Database support also however if your going to create bi
 
 ![Dashboard Other](https://raw.githubusercontent.com/puppetpies/threatmonitor/master/screenshot-4.jpg)
 
-We are also working on a Trafic Visualizer
+We are also working on a Traffic Visualizer
 
 ![Trafviz](https://raw.githubusercontent.com/puppetpies/threatmonitor/master/screenshot-trafviz-1.jpg)
 
