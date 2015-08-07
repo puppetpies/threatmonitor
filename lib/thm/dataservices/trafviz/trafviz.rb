@@ -34,13 +34,13 @@ module Thm
     end
 
     # Filter request data and build query
-    def request_filter(data, keysamples=2000)
+    def request_filter(reqtable, data, keysamples=2000)
       if !request_valid?(data)
         return false
       end
       lkey, rkey = ""
       t = 0
-      sql = "INSERT INTO http_request (guid,"
+      sql = "INSERT INTO #{reqtable} (guid,"
       cols, vals = String.new, String.new
       guid = Tools::guid
       vals = "'#{guid}',"

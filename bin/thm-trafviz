@@ -13,6 +13,7 @@ require 'pcaplet'
 require 'getoptlong'
 require 'keycounter'
 require 'walltime'
+require 'readline'
 
 require File.expand_path(File.join(
           File.dirname(__FILE__),
@@ -135,6 +136,9 @@ gloc.dbconnect
 # Regexp strings first currently excludes POST Data
 HTTP_METHODS_REGEXP = %r=^GET |^HEAD |^PUT |^TRACE |^CONNECT |^OPTIONS |^DELETE |^PROPFIND |^PROPPATCH |^MKCOL |^COPY |^MOVE |^LOCK |^UNLOCK =
 HTTP_METHODS_REGEXP_RESPONSE = %r=^(HTTP\/.*)$=
+HTTP_REQUEST_TABLE = "http_request"
+HTTP_RESPONSE_TABLE = "http_response"
+
 httpdump = Pcaplet.new("-s 1500 -n -i #{@interface}")
 HTTP_REQUEST  = Pcap::Filter.new('tcp dst port 80', httpdump.capture)
 HTTP_RESPONSE = Pcap::Filter.new('tcp src portrange 1024-65535', httpdump.capture)
@@ -157,7 +161,7 @@ httpdump.each_packet {|pkt|
         puts "\e[4;36mRequest Data:\e[0m\ \n\e[0;32m#{data_highlight} \e[0m\ "
         tv.makeurl(data)
         # Process data and prepare then send elsewhere
-        query_return_sql = tv.request_filter(data)
+        query_return_sql = tv.request_filter(HTTP_REQUEST_TABLE, data)
         # Store data into InfluxDB API Capture if @mtable exists else Datastore
         begin
           ires = gloc.query("#{query_return_sql}")
@@ -169,6 +173,8 @@ httpdump.each_packet {|pkt|
         end
         stwt.watch('stop')
         stwt.print_stats
+      elsif data =~ %r=^POST $=
+        puts data_highlight
       end
     when HTTP_RESPONSE
       if data =~ HTTP_METHODS_REGEXP_RESPONSE
