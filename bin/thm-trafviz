@@ -133,12 +133,6 @@ gloc.dbpass = DBPASS
 gloc.dbname = DBNAME
 gloc.dbconnect
 
-# Regexp strings first currently excludes POST Data
-HTTP_METHODS_REGEXP = %r=^GET |^HEAD |^PUT |^TRACE |^CONNECT |^OPTIONS |^DELETE |^PROPFIND |^PROPPATCH |^MKCOL |^COPY |^MOVE |^LOCK |^UNLOCK =
-HTTP_METHODS_REGEXP_RESPONSE = %r=^(HTTP\/.*)$=
-HTTP_REQUEST_TABLE = "http_request"
-HTTP_RESPONSE_TABLE = "http_response"
-
 httpdump = Pcaplet.new("-s 1500 -n -i #{@interface}")
 HTTP_REQUEST  = Pcap::Filter.new('tcp dst port 80', httpdump.capture)
 HTTP_RESPONSE = Pcap::Filter.new('tcp src portrange 1024-65535', httpdump.capture)
