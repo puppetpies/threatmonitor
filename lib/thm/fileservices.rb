@@ -16,9 +16,9 @@ module Thm
       end
       begin
         if loadswitch == true # So original backup config doesn't change your settings
-          require Dir.home+"/.thm/#{file}"
+          require "#{Dir.home}/.thm/#{file}"
         end
-       rescue
+      rescue
         puts "Failed to load something went wrong check permissions !"
       end
     end
