@@ -17,11 +17,7 @@ module Thm
       while row = resusrcnt.fetch_hash do
         continent_name = row["continent_name"].to_s
         country_name = row["country_name"].to_s
-        #if continent_name.strip == "" and country_name.strip != ""
-          res = "(#{country_name})"
-        #elsif continent_name.strip != "" and country_name.strip == ""
-        #  res = "(#{continent_name})"
-        #end
+        res = "(#{country_name})"
       end
       return res
     end
