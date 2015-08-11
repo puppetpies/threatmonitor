@@ -7,9 +7,31 @@ module Thm
     def initialize
       @geodebug = false
     end
+    
+    def self.define_component(name)
+      name_func = name.to_sym
+      define_method(name_func) do 
+        geoquery = "SELECT count(*) as num FROM geoipdata_ipv4blocks_#{name_func} a "
+        geoquery << "JOIN geoipdata_locations_#{name_func} b ON (a.geoname_id = b.geoname_id) "
+        geoquery << "WHERE network LIKE '#{ip.split(".")[0]}.#{ip.split(".")[1]}.%' GROUP BY b.continent_name, b.#{name_func}_name LIMIT 1;"
+        res = @conn.query("#{geoquery}")
+        row = res.fetch_hash
+        num = row["num"].to_i
+        if num == 0;
+          return false
+        else
+          geoquery = "SELECT continent_name, #{name_func}_name FROM geoipdata_ipv4blocks_#{name_func} a "
+          geoquery << "JOIN geoipdata_locations_#{name_func} b ON (a.geoname_id = b.geoname_id) "
+          geoquery << "WHERE network LIKE '#{ip.split(".")[0]}.#{ip.split(".")[1]}.%' GROUP BY b.continent_name, b.#{name_func}_name LIMIT 1;"
+        end
+      end
+    end
 
+    define_component :country?
+    define_component :city?
+  
     def geoiplookup(ip)
-      geoquery = "SELECT continent_name, country_name FROM geoipdata_ipv4blocks_country a JOIN geoipdata_locations_country b ON (a.geoname_id = b.geoname_id) WHERE network LIKE '#{ip.split(".")[0]}.#{ip.split(".")[1]}.%' GROUP BY b.continent_name, b.country_name LIMIT 1;"
+      geoquery = country? | city?
       if @geodebug == true
         puts "Geo Query: #{geoquery}"
       end
