@@ -18,12 +18,12 @@ require 'slim'
 require 'colorize'
 
 require File.expand_path(File.join(
-          File.dirname(__FILE__),
-          "../thm-authentication.rb"))
+        File.dirname(__FILE__),
+        "../thm-authentication.rb"))
 
 require File.expand_path(File.join(
-          File.dirname(__FILE__),
-          "../lib/thm/version.rb"))
+        File.dirname(__FILE__),
+        "../lib/thm/version.rb"))
 
 
 class Sinatra::Base
