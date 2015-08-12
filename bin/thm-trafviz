@@ -85,7 +85,8 @@ banner << "\e[1;34m=================================================\e[0m\ \n\n"
 opts = GetoptLong.new(
   [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
   [ '--countheaders', '-c', GetoptLong::NO_ARGUMENT ],
-  [ '--interface', '-i', GetoptLong::REQUIRED_ARGUMENT],
+  [ '--interface', '-i', GetoptLong::OPTIONAL_ARGUMENT],
+  [ '--snaplength', '-s', GetoptLong::OPTIONAL_ARGUMENT],
   [ '--debug', '-d', GetoptLong::NO_ARGUMENT ],
 )
 
@@ -98,7 +99,9 @@ opts.each do |opt, arg|
    
 -c, --countheaders - Count HTTP Header types ( Builds a create table statement )[ NO_ARGUMENT ]
 
--i, --interface -- Network Interface to collect measurements from [ REQUIRED_ARGUMENT ]
+-i, --interface - Network Interface to collect measurements from [ OPTIONAL_ARGUMENT ]
+
+-s, --snaplength - Snaplength [ OPTIONAL_ARGUMENT ]
 
 -d --debug
 
@@ -114,7 +117,9 @@ opts.each do |opt, arg|
     when '--debug'
       @debug = true
     when '--interface'
-      @interface = arg
+      @interface = nil || arg
+    when '--snaplength'
+      @snaplength = nil || arg
   end
 end
 
@@ -133,7 +138,35 @@ gloc.dbpass = DBPASS
 gloc.dbname = DBNAME
 gloc.dbconnect
 
-httpdump = Pcaplet.new("-s 1500 -n -i #{@interface}")
+def use_const_defined_unless?(const)
+  const_down = const.downcase
+  if Kernel.const_defined?("#{const}")
+    if instance_variable_get("@#{const_down}") == nil
+      instance_variable_set("@#{const_down}", Kernel.const_get("#{const}"))
+      puts "Config Constant #{const}: #{Kernel.const_get("#{const}")}"
+      puts "Instance Variable @#{const_down}: #{instance_variable_get("@#{const_down}")}"
+    else
+      puts "Param via Getoptlong: Instance Variable #{@const_down}: #{instance_variable_get("@#{const_down}")}"
+    end
+  else
+    raise "No Config option set"
+  end
+end
+
+use_const_defined_unless?("INTERFACE")
+use_const_defined_unless?("SNAPLENGTH")
+
+#if Kernel.const_defined?("NETWORKINTERFACE")
+#  @interface = NETWORKINTERFACE unless @interface
+#end
+#if Kernel.const_defined?("SNAPLENGTH")
+#  @snaplength = SNAPLENGTH unless @snaplength
+#end
+
+startup = "-s #{@snaplength} -n -i #{@interface}"
+puts "Startup Parameters: #{startup}"
+httpdump = Pcaplet.new(startup)
+
 HTTP_REQUEST  = Pcap::Filter.new('tcp dst port 80', httpdump.capture)
 HTTP_RESPONSE = Pcap::Filter.new('tcp src portrange 1024-65535', httpdump.capture)
 httpdump.add_filter(HTTP_REQUEST | HTTP_RESPONSE)
