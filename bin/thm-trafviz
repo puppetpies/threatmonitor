@@ -156,13 +156,6 @@ end
 use_const_defined_unless?("INTERFACE")
 use_const_defined_unless?("SNAPLENGTH")
 
-#if Kernel.const_defined?("NETWORKINTERFACE")
-#  @interface = NETWORKINTERFACE unless @interface
-#end
-#if Kernel.const_defined?("SNAPLENGTH")
-#  @snaplength = SNAPLENGTH unless @snaplength
-#end
-
 startup = "-s #{@snaplength} -n -i #{@interface}"
 puts "Startup Parameters: #{startup}"
 httpdump = Pcaplet.new(startup)
