@@ -31,6 +31,10 @@ module Thm
     HTTP_REQUEST_TABLE = "http_request"
     HTTP_RESPONSE_TABLE = "http_response"
     
+    # Misc
+    SNAPLENGTH = 65536
+    INTERFACE = "eth0"
+
   end
 
 end
