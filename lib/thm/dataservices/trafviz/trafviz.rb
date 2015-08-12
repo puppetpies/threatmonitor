@@ -36,7 +36,8 @@ module Thm
     # Filter request data and build query
     def request_filter(reqtable, data, keysamples=2000)
       if !request_valid?(data)
-        return false
+        sql = "SELECT 1;"
+        return sql
       end
       lkey, rkey = ""
       t = 0
