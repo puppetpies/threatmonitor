@@ -36,7 +36,22 @@ module Tools
         n.puts("#{data}")
       }
     end
-  
+    
+  end
+
+  def use_const_defined_unless?(const)
+    const_down = const.downcase
+    if Kernel.const_defined?("#{const}")
+      if instance_variable_get("@#{const_down}") == nil
+        instance_variable_set("@#{const_down}", Kernel.const_get("#{const}"))
+        puts "Config Constant #{const}: #{Kernel.const_get("#{const}")}"
+        puts "Instance Variable @#{const_down}: #{instance_variable_get("@#{const_down}")}"
+      else
+        puts "Param via Getoptlong: Instance Variable #{@const_down}: #{instance_variable_get("@#{const_down}")}"
+      end
+    else
+      raise "No Config option set add #{const} to your config.rb"
+    end
   end
   
 end
