@@ -149,7 +149,7 @@ def use_const_defined_unless?(const)
       puts "Param via Getoptlong: Instance Variable #{@const_down}: #{instance_variable_get("@#{const_down}")}"
     end
   else
-    raise "No Config option set"
+    raise "No Config option set add #{const} to your config.rb"
   end
 end
 
