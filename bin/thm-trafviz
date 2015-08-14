@@ -11,7 +11,6 @@
 
 require 'pcaplet'
 require 'getoptlong'
-require 'keycounter'
 require 'walltime'
 require 'readline'
 
@@ -24,41 +23,6 @@ conf.thmhome?
 
 include Thm::Defaults
 include Tools
-
-class Keycounter
-  
-  # Essentially custom def for this program
-  def keycount_createtablethm
-    fieldlst = Array.new
-    if File.exists?("/tmp/thmreadtable.txt")
-      File.open("/tmp/thmreadtable.txt", 'r') {|n|
-        n.each_line {|l|
-          fieldlst << ["#{l}"]
-        }
-      }
-    end
-    sql = "CREATE TABLE http_request (\n"
-    sql << "guid char(36),\n"
-    instance_variables.each {|n|
-      t = n.to_s.gsub("@", "")
-      fieldlst << ["#{t}"]
-    }
-    fieldlst.each {|n|
-      sql << "#{n} string,\n"
-    }
-    sql = sql[0..sql.size - 2]
-    sql << "\n);\n"
-    b = fieldlst.uniq.sort
-    pp b
-    File.open("/tmp/thmreadtable.txt", 'w') {|n|
-      b.each {|j|
-        n.puts(j)
-      }
-    }
-    puts "\e[4;36mCreate table:\e[0m\ \n #{sql}"
-  end
-  
-end
 
 class NilClass
 
@@ -80,6 +44,7 @@ end
 
 ARGV[0] = "--help" if ARGV[0] == nil
 @debug = false
+@countheaders = false
 banner = "\e[1;34mWelcome to Threatmonitor HTTP Traffic Visualizer \e[0m\ \n"
 banner << "\e[1;34m=================================================\e[0m\ \n\n"
 
@@ -112,8 +77,6 @@ opts.each do |opt, arg|
       exit
     when '--countheaders'
       @countheaders = true
-      @k = Keycounter.new
-      @f = 0
       puts "Counters Enabled"
     when '--debug'
       @debug = true
@@ -144,8 +107,8 @@ use_const_defined_unless?("SNAPLENGTH")
 
 startup = "-s #{@snaplength} -n -i #{@interface}"
 puts "Startup Parameters: #{startup}"
-httpdump = Pcaplet.new(startup)
 
+httpdump = Pcaplet.new(startup)
 HTTP_REQUEST  = Pcap::Filter.new('tcp dst port 80', httpdump.capture)
 HTTP_RESPONSE = Pcap::Filter.new('tcp src portrange 1024-65535', httpdump.capture)
 httpdump.add_filter(HTTP_REQUEST | HTTP_RESPONSE)
@@ -167,7 +130,7 @@ httpdump.each_packet {|pkt|
         puts "\e[4;36mRequest Data:\e[0m\ \n\e[0;32m#{data_highlight} \e[0m\ "
         tv.makeurl(data)
         # Process data and prepare then send elsewhere
-        query_return_sql = tv.request_filter(HTTP_REQUEST_TABLE, data)
+        query_return_sql = tv.request_filter(HTTP_REQUEST_TABLE, data, @countheaders)
         # Store data into InfluxDB API Capture if @mtable exists else Datastore
         begin
           ires = gloc.query("#{query_return_sql}")
