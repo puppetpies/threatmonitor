@@ -1,7 +1,49 @@
+require 'keycounter'
+
+class Keycounter
+  
+  # Essentially custom def for this program
+  def keycount_createtablethm
+    fieldlst = Array.new
+    if File.exists?("/tmp/thmreadtable.txt")
+      File.open("/tmp/thmreadtable.txt", 'r') {|n|
+        n.each_line {|l|
+          fieldlst << ["#{l}"]
+        }
+      }
+    end
+    sql = "CREATE TABLE http_request (\n"
+    sql << "guid char(36),\n"
+    instance_variables.each {|n|
+      t = n.to_s.gsub("@", "")
+      fieldlst << ["#{t}"]
+    }
+    fieldlst.each {|n|
+      sql << "#{n} string,\n"
+    }
+    sql = sql[0..sql.size - 2]
+    sql << "\n);\n"
+    b = fieldlst.uniq.sort
+    pp b
+    File.open("/tmp/thmreadtable.txt", 'w') {|n|
+      b.each {|j|
+        n.puts(j)
+      }
+    }
+    puts "\e[4;36mCreate table:\e[0m\ \n #{sql}"
+  end
+  
+end
+
 module Thm
 
   class DataServices::Trafviz
 
+    def initialize
+      @k = Keycounter.new
+      @f = 0
+    end
+    
     def makeurl(data)
       if !request_valid?(data)
         return false
@@ -34,7 +76,7 @@ module Thm
     end
 
     # Filter request data and build query
-    def request_filter(reqtable, data, keysamples=2000)
+    def request_filter(reqtable, data, countheaders, keysamples=2000)
       if !request_valid?(data)
         sql = "SELECT 1;"
         return sql
@@ -61,7 +103,7 @@ module Thm
               vals << "'#{rkey}',"
             end
             # Keycounter / HTTP Headers counter
-            if @countheaders == true
+            if countheaders == true
               # Keysamples: For Headers counter number of output lines to sample before exit.
               if @f < keysamples
                 if lkey != ""
