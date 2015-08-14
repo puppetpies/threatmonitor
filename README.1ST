@@ -1,5 +1,5 @@
-Threatmonitor Packet Analysis Suite HOWTO
-=========================================
+Threatmonitor Packet Analysis Suite - Docker Image HOWTO
+========================================================
 
 To import example data.
 
@@ -11,7 +11,7 @@ Will also need to import the GeoIP Data.
 
 The web interface admin login is admin - default password goblin
 
-You will also need the GeoIP Data importing as well for the Web interface Dashboard the operate
+You will also need the GeoIP Data importing as well for the Web interface Dashboard to operate
 
 mclient -u monetdb -d threatmonitor < geoip-import.sql
 
@@ -21,7 +21,7 @@ http://172.17.0.1:4567/dashboard
 
 Your defaults file is the config.rb in the gem directory for now.
 
-/usr/local/lib/ruby/gems/2.1.0/gems/thm-0.1.9/config.rb
+/home/<username>/config.rb
 
 To Capture data:
 
