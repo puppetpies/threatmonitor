@@ -8,9 +8,7 @@ module Thm
     
     def initialize
       @geodebug = false
-      @continent_name = Array.new
-      @country_name = Array.new
-      @city_name = Array.new
+      @continent_name, @country_name, @city_name = Array.new, Array.new, Array.new
     end
     
     def self.define_component(name)
