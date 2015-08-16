@@ -13,6 +13,7 @@ require 'pcaplet'
 require 'getoptlong'
 require 'walltime'
 require 'readline'
+require 'mymenu'
 
 require File.expand_path(File.join(
           File.dirname(__FILE__),
@@ -106,13 +107,136 @@ use_const_defined_unless?("INTERFACE")
 use_const_defined_unless?("SNAPLENGTH")
 
 startup = "-s #{@snaplength} -n -i #{@interface}"
-puts "Startup Parameters: #{startup}"
+puts "Trafviz - Startup Parameters: #{startup}"
 
-httpdump = Pcaplet.new(startup)
-HTTP_REQUEST  = Pcap::Filter.new('tcp dst port 80', httpdump.capture)
-HTTP_RESPONSE = Pcap::Filter.new('tcp src portrange 1024-65535', httpdump.capture)
-httpdump.add_filter(HTTP_REQUEST | HTTP_RESPONSE)
-httpdump.each_packet {|pkt|
+module Thm
+
+  class DataServices::Trafviz::FilterManager
+
+    attr_reader :bookmarks, :pcapsetfilter
+    
+    def initialize
+      @bookmarks = Array.new
+      @bkm = MyMenu.new
+      @bkm.settitle("Welcome to Trafviz")
+      @bkm.mymenuname = "Trafviz"
+      @bkm.prompt = "Trafviz"
+    end
+
+    def read(file)
+      b = 1
+      File.open("#{Dir.home}/.thm/#{file}", 'r') {|n|
+        n.each_line {|l|
+          puts "\e[1;36m#{b})\e[0m\ #{l}"
+          @bookmarks[b] = l
+          b += 1
+        }
+      }
+    end
+
+    def write(file)
+      @bkm.mymenuname = "Filters"
+      @bkm.prompt = "\e[1;33m\Set filter>\e[0m\ "
+      addfilter = @bkm.definemenuitem("selectfilter", true) do
+        # Just needs value returned via readline block into addfilter
+      end
+      File.open("#{Dir.home}/.thm/#{file}", 'w') {|n|
+        n.puts("#{addfilter}")
+      }
+    end
+    
+    def set_defaults(file)
+      # Add default example filters
+      File.open("#{Dir.home}/.thm/#{file}", 'w') {|n|
+        n.puts("webtraffic: tcp dst port 80")
+        n.puts("sourceportrange: tcp src portrange 1024-65535")
+      }
+    end
+    
+    def build_filter_menu
+      @bkm.settitle("Welcome to Trafviz")
+      @bkm.mymenuname = "Trafviz"
+      @bkm.prompt = "Trafviz"
+      cur = 1
+      @bookmarks.each {|n|
+        func_name = "#{n[cur].split(":")[0]};" # Added semicolon for execution
+        pcap_filter = n[cur].split(":")[1]
+=begin
+codeeval = %Q{@bkm.definemenuitem("#{func_name}") do
+  @pcapsetfilter = "#{pcapfilter}"
+end}
+        @bkm.additemtolist(cur, "#{pcap_filter}", "#{func_name}")
+        cur += 1
+      }
+=end
+      # Instance Eval probably nicer
+      @bkm.instance_eval do
+        definemenuitem("#{func_name}") do
+          @pcapsetfilter = "#{pcapfilter}"
+        end
+        additemtolist(cur, "#{pcap_filter}", "#{func_name}")
+        cur += 1
+      end
+=begin
+      eval(codeeval)
+=end
+      @bkm.additemtolist(7, "Display Menu", "showmenu;")
+      @bkm.additemtolist(8, "Toggle Menu", "togglemenu;")
+      @bkm.additemtolist(9, "Exit Trafviz", "exit;")
+      @bkm.menu!
+    end
+        
+    def load_filters(file)
+      if File.exists?("#{Dir.home}/.thm/#{file}")
+        read(file)
+      else
+        set_defaults(file)
+        read(file)
+      end
+      build_filter_menu
+    end
+    
+  end
+  
+end
+
+
+=begin
+x = MyMenu.new
+#x.debug = 3
+x.settitle("Welcome to Trafviz")
+x.mymenuname = "Trafviz"
+x.prompt = "Trafviz"
+# Add my methods
+x.definemenuitem("selectfilters") do
+  filtermanager("filters.lst", "read")
+end
+# Define dummy method and create another instance of the class inside it.
+x.definemenuitem("setfilters") do
+  # My Set filters block
+  y = MyMenu.new
+  #y.debug = 3
+  y.prompt = "Trafiz {Filters}>"
+  y.definemenuitem("setfilter", true) do
+    puts "Hello"
+  end
+  # Execute function you just created
+  y.setfilter
+end
+# Define your list items
+x.additemtolist(1, "Select Filters", "selectfilters;")
+x.additemtolist(2, "Set Filters", "setfilters;")
+x.additemtolist(3, "Display Menu", "showmenu;")
+x.additemtolist(4, "Toggle Menu", "togglemenu;")
+x.additemtolist(5, "Exit Trafviz", "exit;")
+x.menu!
+=end
+
+@filter = Pcaplet.new(startup)
+HTTP_REQUEST  = Pcap::Filter.new('tcp dst port 80', @filter.capture)
+HTTP_RESPONSE = Pcap::Filter.new('tcp src portrange 1024-65535', @filter.capture)
+@filter.add_filter(HTTP_REQUEST | HTTP_RESPONSE)
+@filter.each_packet {|pkt|
   #begin
     data = pkt.tcp_data.to_s
     data_highlight = tv.text_highlighter(data)
