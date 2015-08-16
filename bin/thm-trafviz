@@ -169,14 +169,15 @@ end}
         cur += 1
       }
 =end
-      # Instance Eval probably nicer
-      @bkm.instance_eval do
-        definemenuitem("#{func_name}") do
-          @pcapsetfilter = "#{pcapfilter}"
+        # Instance Eval probably nicer
+        @bkm.instance_eval do
+          definemenuitem("#{func_name}") do
+            @pcapsetfilter = "#{pcapfilter}"
+          end
+          additemtolist(cur, "#{pcap_filter}", "#{func_name}")
+          cur += 1
         end
-        additemtolist(cur, "#{pcap_filter}", "#{func_name}")
-        cur += 1
-      end
+      }
 =begin
       eval(codeeval)
 =end
