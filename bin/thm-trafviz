@@ -179,14 +179,6 @@ module Thm
         func_name = n.split(":")[0]
         pcap_filter = n.split(":")[1].lstrip
         puts "#{pcap_filter}"
-=begin
-codeeval = %Q{@bkm.definemenuitem("#{func_name}") do
-  @pcapsetfilter = "#{pcapfilter}"
-end}
-        @bkm.additemtolist(cur, "#{pcap_filter}", "#{func_name}")
-        cur += 1
-      }
-=end
         # Instance Eval probably nicer
         fltvalid = validate_filter?("#{pcap_filter}") # Because validate_filter? won't exist inside instance_eval
         @bkm.instance_eval do
@@ -200,9 +192,6 @@ end}
           end
         end
       }
-=begin
-      eval(codeeval)
-=end
       @bkm.instance_eval do
         definemenuitem("showfilter") do
           puts "Filter: #{@pcapsetfilter}"
