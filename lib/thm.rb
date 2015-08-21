@@ -22,7 +22,15 @@ include Pcap
 #
 # Create def's for that packet SQL / Refactor to provent code duplication
 # Create def's for Hash table YAML same idea as above.
-    
+
+class String
+
+  def size_minus(min=1)
+    size - min
+  end
+
+end
+
 module Tools
 
   class << self
