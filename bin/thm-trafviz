@@ -188,7 +188,7 @@ module Thm
               @pcapsetfilter = "#{pcap_filter}"
               #thm = DataServices::Trafviz::Main.new
             end
-            additemtolist("#{pcap_filter}", "#{func_name};")
+            additemtolist("#{func_name}: #{pcap_filter}", "#{func_name};")
           end
         end
       }
@@ -229,12 +229,15 @@ module Thm
     def initialize
       @filter_const = Array.new
       @startup = String.new
+      @thm = Thm::DataServices::Trafviz::FilterManager.new
     end
 
     def addfilter(const, filter)
-      filtercode = %Q{#{const} = Pcap::Filter.new('#{filter}', @trafviz.capture)}
-      @filter_const << "#{const}"
-      eval(filtercode)
+      if @thm.validate_filter?(filter) == true
+        filtercode = %Q{#{const} = Pcap::Filter.new('#{filter}', @trafviz.capture)}
+        @filter_const << "#{const}"
+        eval(filtercode)
+      end
     end
     
     def commitfilters
