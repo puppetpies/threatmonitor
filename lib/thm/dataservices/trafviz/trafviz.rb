@@ -75,13 +75,26 @@ module Thm
       end
     end
 
+    # Cookie ommit as we don't want to steal cookie data and pointless to store.
+    def filter_header?(lkey)
+      case lkey
+      when "cookie"
+        return "cookieommited"
+      end
+    end
+    
+    # Right Cell eval
+    def rkey_encode(rkey)
+      rkeyenc = URI.encode(rkey)
+    end
+    
     # Filter request data and build query
     def request_filter(reqtable, data, countheaders, keysamples=2000)
       if !request_valid?(data)
         sql = "SELECT 1;"
         return sql
       end
-      lkey, rkey = ""
+      lkey, rkey = String.new, String.new
       t = 0
       sql = "INSERT INTO #{reqtable} (guid,"
       cols, vals = String.new, String.new
@@ -91,13 +104,12 @@ module Thm
         unless n.strip == ""
           if t > 0 # Don't processes GET / POST Line
             lkey = n.split(":")[0].downcase.gsub("-", "").to_s.strip
-            #puts "LKEY: #{lkey}"
-            if lkey == "cookie"
-              rkeyenc = "cookieommited"
-            else
-              rkey = n.split(":")[1].to_s.gsub(",", "").gsub(";", "").gsub("=", "").strip
-              rkeyenc = URI.encode(rkey)
+            rkey = n.split(":")[1].to_s.gsub(",", "").gsub(";", "").gsub("=", "").strip
+            rkeyenc = filter_header?(lkey)
+            if rkeyenc != "cookieommited"
+              rkeyenc = rkey_encode(rkey)
             end
+            
             if ((rkey.strip != "" or lkey.strip != "") and (lkey.strip != "range"))
               cols << "#{lkey},"
               vals << "'#{rkey}',"
