@@ -93,6 +93,7 @@ puts banner
 
 # Trafviz DataServices
 tv = Thm::DataServices::Trafviz.new
+if defined?(@countheaders); tv.countheaders = true; end
 # Connect to Datastore
 gloc = Thm::DataServices::Geolocation.new
 gloc.datastore = DATASTORE
@@ -144,7 +145,7 @@ module Thm
       end
       fltvalid = validate_filter?("#{pcapfilter}")
       if fltvalid == true
-        File.open("#{Dir.home}/.thm/#{file}", 'a') {|n|
+        File.open("#{Dir.home}/.thm/#{file}", 'a') {|n| # Append to filter file
           n.puts("#{addfilter}")
         }
       end
@@ -235,13 +236,13 @@ module Thm
     def addfilter(const, filter)
       if @thm.validate_filter?(filter) == true
         filtercode = %Q{#{const} = Pcap::Filter.new('#{filter}', @trafviz.capture)}
-        @filter_const << "#{const}"
+        @filter_const << "#{const})"
         eval(filtercode)
       end
     end
     
     def commitfilters
-      flts = @filter_const.join(" | ")
+      flts = @filter_const.join(" | ") # Build string of CONST names
       commitcode = %Q{@trafviz.add_filter(#{flts})}
       eval(flts)
     end
@@ -287,7 +288,7 @@ HTTP_RESPONSE = Pcap::Filter.new('tcp src portrange 1024-65535', @trafviz.captur
         puts "\e[4;36mRequest Data:\e[0m\ \n\e[0;32m#{data_highlight} \e[0m\ "
         tv.makeurl(data)
         # Process data and prepare then send elsewhere
-        query_return_sql = tv.request_filter(HTTP_REQUEST_TABLE, data, @countheaders)
+        query_return_sql = tv.request_filter(HTTP_REQUEST_TABLE, data)
         # Store data into InfluxDB API Capture if @mtable exists else Datastore
         begin
           ires = gloc.query("#{query_return_sql}")
