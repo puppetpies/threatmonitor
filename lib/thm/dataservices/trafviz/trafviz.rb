@@ -44,6 +44,7 @@ module Thm
     def initialize
       @k = Keycounter.new
       @countheaders = false
+      @debug = false
       @snum = 0
     end
     
@@ -63,7 +64,7 @@ module Thm
       puts "\e[1;37mURL: http://#{hostn}#{requestn} \e[0m\ "
     end
 
-    # Check if a request isn't just a GET line without headers
+    # Check if a request isn't just a GET line without headers / single line
     # Not sure if this is valid HTTP
     def request_valid?(data)
       ln = 0
@@ -73,16 +74,27 @@ module Thm
       if ln > 1
         return true
       else
-        puts "\e[1;31mCatch GET's without header information \e[0m\ "
+        puts "\e[1;31mCatch GET's without header information / Other \e[0m\ "
         return false # Due to single GET Requests to no headers 
       end
     end
-
+    
+    def hit_header(hdrs)
+      puts "Hit #{hdrs} header"
+    end
+    
     # Cookie ommit as we don't want to steal cookie data and pointless to store.
     def filter_header?(lkey)
-      case lkey
+      puts "MY LKEY: |#{lkey}|" if @debug == true
+      case lkey.strip
       when "cookie"
-        return "cookieommited"
+        hit_header(lkey) if @debug == true
+        return true
+      when "range"
+        hit_header(lkey) if @debug == true
+        return true
+      else
+        return false
       end
     end
     
@@ -117,11 +129,14 @@ module Thm
           if t > 0 # Don't processes GET / POST Line
             lkey = lkey_strip(n)
             rkey = rkey_strip(n)
+            puts "LKEY: #{lkey} RKEY: #{rkey}" if @debug == true
             rkeyenc = filter_header?(lkey)
-            if rkeyenc != "cookieommited"
+            if rkeyenc == false
               rkeyenc = rkey_encode(rkey)
+            else 
+              rkey = "ommited"
             end
-            if ((rkey.strip != "" or lkey.strip != "") and (lkey.strip != "range"))
+            if rkey.strip != "" or lkey.strip != ""
               cols << "#{lkey},"
               vals << "'#{rkey}',"
             end
@@ -131,7 +146,7 @@ module Thm
               # snum gets incremented so each request increments an instance variable to it keeps it position per request
               if @snum < keysamples
                 if lkey != ""
-                  @k.keycount("#{lkey}")
+                  @k.keycount("THM_#{lkey}")
                   @snum += 1
                   puts "Sample ##{@snum} of ##{keysamples}" 
                 end
@@ -161,7 +176,7 @@ module Thm
       keys = ["Linux", "Java", "Android", "iPhone", "Mobile", "Chrome", 
               "Safari", "Mozilla", "Gecko", "AppleWebKit", "Windows", 
               "MSIE", "Win64", "Trident", "wispr", "PHPSESSID", "JSESSIONID",
-              "AMD64", "Darwin", "Macintosh", "Mac OS X", "Dalvik"]
+              "AMD64", "Darwin", "Macintosh", "Mac OS X", "Dalvik", "text/html", "xml"]
       cpicker = [2,3,4,1,7,5,6]
       keys.each {|n|
         text.gsub!("#{n}", "\e[4;3#{cpicker[rand(cpicker.size)]}m#{n}\e[0m\ \e[0;32m".strip)
