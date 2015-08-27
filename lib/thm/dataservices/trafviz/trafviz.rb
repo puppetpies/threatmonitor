@@ -39,9 +39,12 @@ module Thm
 
   class DataServices::Trafviz
 
+    attr_writer :countheaders
+    
     def initialize
       @k = Keycounter.new
-      @f = 0
+      @countheaders = false
+      @snum = 0
     end
     
     def makeurl(data)
@@ -88,40 +91,49 @@ module Thm
       rkeyenc = URI.encode(rkey)
     end
     
+    # Filter lkey = header, rkey = requestdata
+    def lkey_strip(hdrs)
+      hdrs.split(":")[0].downcase.gsub("-", "").to_s.strip
+    end
+    
+    def rkey_strip(data)
+      data.split(":")[1].to_s.gsub(",", "").gsub(";", "").gsub("=", "").strip
+    end
+    
     # Filter request data and build query
-    def request_filter(reqtable, data, countheaders, keysamples=2000)
+    def request_filter(reqtable, data, keysamples=2000)
       if !request_valid?(data)
         sql = "SELECT 1;"
         return sql
       end
+      guid = Tools::guid
+      cols, vals = String.new, String.new
       lkey, rkey = String.new, String.new
       t = 0
       sql = "INSERT INTO #{reqtable} (guid,"
-      cols, vals = String.new, String.new
-      guid = Tools::guid
       vals = "'#{guid}',"
       data.each_line {|n|
         unless n.strip == ""
           if t > 0 # Don't processes GET / POST Line
-            lkey = n.split(":")[0].downcase.gsub("-", "").to_s.strip
-            rkey = n.split(":")[1].to_s.gsub(",", "").gsub(";", "").gsub("=", "").strip
+            lkey = lkey_strip(n)
+            rkey = rkey_strip(n)
             rkeyenc = filter_header?(lkey)
             if rkeyenc != "cookieommited"
               rkeyenc = rkey_encode(rkey)
             end
-            
             if ((rkey.strip != "" or lkey.strip != "") and (lkey.strip != "range"))
               cols << "#{lkey},"
               vals << "'#{rkey}',"
             end
             # Keycounter / HTTP Headers counter
-            if countheaders == true
+            if @countheaders == true
               # Keysamples: For Headers counter number of output lines to sample before exit.
-              if @f < keysamples
+              # snum gets incremented so each request increments an instance variable to it keeps it position per request
+              if @snum < keysamples
                 if lkey != ""
                   @k.keycount("#{lkey}")
-                  @f = @f + 1
-                  puts "Sample ##{@f} of##{keysamples}" 
+                  @snum += 1
+                  puts "Sample ##{@snum} of ##{keysamples}" 
                 end
               else
                 pp @k.keycount_compile
