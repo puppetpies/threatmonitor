@@ -15,7 +15,7 @@ class Keycounter
     sql = "CREATE TABLE http_request (\n"
     sql << "guid char(36),\n"
     instance_variables.each {|n|
-      t = n.to_s.gsub("@", "")
+      t = n.to_s.gsub("@", "").gsub("THM_")
       fieldlst << ["#{t}"]
     }
     fieldlst.each {|n|
@@ -99,8 +99,8 @@ module Thm
     end
     
     # Right Cell eval
-    def rkey_encode(rkey)
-      rkeyenc = URI.encode(rkey)
+    def rkey_decode(rkey)
+      rkeyenc = URI.decode(rkey)
     end
     
     # Filter lkey = header, rkey = requestdata
@@ -127,12 +127,11 @@ module Thm
       data.each_line {|n|
         unless n.strip == ""
           if t > 0 # Don't processes GET / POST Line
-            lkey = lkey_strip(n)
-            rkey = rkey_strip(n)
+            lkey, rkey = lkey_strip(n), rkey_strip(n)
             puts "LKEY: #{lkey} RKEY: #{rkey}" if @debug == true
             rkeyenc = filter_header?(lkey)
             if rkeyenc == false
-              rkeyenc = rkey_encode(rkey)
+              rkeyenc = rkey_decode(rkey)
             else 
               rkey = "ommited"
             end
@@ -158,7 +157,7 @@ module Thm
               end
             end
           end
-          t = t + 1
+          t += 1
         end
       }
       # SQL for Datastore
