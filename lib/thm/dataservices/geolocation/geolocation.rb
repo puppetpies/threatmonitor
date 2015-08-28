@@ -11,12 +11,21 @@ module Thm
       @continent_name, @country_name, @city_name = Array.new, Array.new, Array.new
     end
     
+    def formatinet(ip, octets=2)
+      if octets == 2
+        "#{ip.split(".")[0]}.#{ip.split(".")[1]}"
+      elsif octets == 3
+        "#{ip.split(".")[0]}.#{ip.split(".")[1]}.#{ip.split(".")[2]}"
+      end
+    end
+    
     def self.define_component(name)
       name_func = name.to_sym
       define_method(name_func) do |ip|
+        octets = formatinet(ip, 2)
         geoquery = "SELECT count(*) as num FROM geoipdata_ipv4blocks_#{name_func} a "
         geoquery << "JOIN geoipdata_locations_#{name_func} b ON (a.geoname_id = b.geoname_id) "
-        geoquery << "WHERE network LIKE '#{ip.split(".")[0]}.#{ip.split(".")[1]}.%';"
+        geoquery << "WHERE network LIKE '#{octets}.%';"
         begin
           res = @conn.query("#{geoquery}")
           rowgeocount = res.fetch_hash
@@ -28,7 +37,7 @@ module Thm
         if geocount > 0;
           geoquery = "SELECT continent_name, #{name_func}_name FROM geoipdata_ipv4blocks_#{name_func} a "
           geoquery << "JOIN geoipdata_locations_#{name_func} b ON (a.geoname_id = b.geoname_id) "
-          geoquery << "WHERE network LIKE '#{ip.split(".")[0]}.#{ip.split(".")[1]}.%' GROUP BY b.continent_name, b.#{name_func}_name LIMIT 1;"
+          geoquery << "WHERE network LIKE '#{octets}.%' GROUP BY b.continent_name, b.#{name_func}_name LIMIT 1;"
           puts "Geo SELECT: #{geoquery}" if @geodebug == true
           begin
             resgeo = @conn.query("#{geoquery}")
