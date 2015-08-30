@@ -1,3 +1,13 @@
+########################################################################
+#
+# Author: Brian Hood
+# Email: <brianh6854@googlemail.com>
+# Description: Libraries
+#
+#   Message queue data producer / data transport
+#
+########################################################################
+
 module Thm
   # Send data else were
   
