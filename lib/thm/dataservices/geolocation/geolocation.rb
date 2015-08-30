@@ -1,3 +1,13 @@
+########################################################################
+#
+# Author: Brian Hood
+# Email: <brianh6854@googlemail.com>
+# Description: Libraries - geolocation
+#
+#   Geo Data quick and simple
+#
+########################################################################
+
 require 'pp'
 
 module Thm

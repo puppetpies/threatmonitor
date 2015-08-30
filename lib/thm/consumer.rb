@@ -1,3 +1,12 @@
+########################################################################
+#
+# Author: Brian Hood
+# Email: <brianh6854@googlemail.com>
+# Description: Libraries
+#
+#   Pull data from required sources
+#
+########################################################################
 
 trap("INT") {
   
