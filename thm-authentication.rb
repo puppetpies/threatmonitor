@@ -2,8 +2,9 @@
 #
 # Author: Brian Hood
 #
+# Email: <brianh6854@googlemail.com>
 # Description: Threatmonitor User Administration
-# 
+#
 # Extends the functionality of the Thm module adding Authorization
 # Adding Authentication to the Privileges model
 #

@@ -1,7 +1,7 @@
 ########################################################################
 #
 # Author: Brian Hood
-#
+# Email: <brianh6854@googlemail.com>
 # Description: Threatmonitor Authorization
 # 
 # Extends the functionality of the Thm module adding Authorization
