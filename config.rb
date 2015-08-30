@@ -1,7 +1,7 @@
 ########################################################################
 #
 # Author: Brian Hood
-#
+# Email: <brianh6854@googlemail.com>
 # Description: Threatmonitor User configuration
 #
 # Lets keep it simple and use constants

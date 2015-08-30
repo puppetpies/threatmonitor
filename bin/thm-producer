@@ -2,7 +2,7 @@
 ########################################################################
 #
 # Author: Brian Hood
-#
+# Email: <brianh6854@googlemail.com>
 # Description: Threatmonitor Producer
 #
 # Producer - Load data Database to RabbitMQ for distrubition or Packet 
