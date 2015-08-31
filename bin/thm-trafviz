@@ -49,6 +49,11 @@ ARGV[0] = "--help" if ARGV[0] == nil
 @countheaders = false
 banner = "\e[1;34mWelcome to Threatmonitor HTTP Traffic Visualizer \e[0m\ \n"
 banner << "\e[1;34m=================================================\e[0m\ \n\n"
+m = %Q{  
+ /\
+/\/\
+\/\/
+ \/}
 
 opts = GetoptLong.new(
   [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
@@ -273,7 +278,8 @@ HTTP_RESPONSE = Pcap::Filter.new('tcp src portrange 1024-65535', @trafviz.captur
 @trafviz.add_filter(HTTP_REQUEST | HTTP_RESPONSE)
 @trafviz.each_packet {|pkt|
     data = pkt.tcp_data.to_s
-    data_highlight = tv.text_highlighter(data)
+    data_orig = data.clone
+    data_highlight = tv.text_highlighter(data_orig)
     case pkt
     when HTTP_REQUEST
       if data =~ HTTP_METHODS_REGEXP
@@ -286,7 +292,7 @@ HTTP_RESPONSE = Pcap::Filter.new('tcp src portrange 1024-65535', @trafviz.captur
         geo = gloc.geoiplookup(host.split(":")[0])
         puts "\e[4;36mGeo Location:\e[0m\ \n\e[0;35m#{geo} \e[0m\ "
         puts "\e[4;36mRequest Data:\e[0m\ \n\e[0;32m#{data_highlight} \e[0m\ "
-        tv.makeurl(data)
+        tv.makeurl(data_orig)
         # Process data and prepare then send elsewhere
         query_return_sql = tv.request_filter(HTTP_REQUEST_TABLE, data)
         # Store data into InfluxDB API Capture if @mtable exists else Datastore
