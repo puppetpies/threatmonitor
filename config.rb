@@ -28,8 +28,8 @@ module Thm
     # Regexp strings first currently excludes POST Data
     HTTP_METHODS_REGEXP = %r=^GET |^HEAD |^PUT |^TRACE |^CONNECT |^OPTIONS |^DELETE |^PROPFIND |^PROPPATCH |^MKCOL |^COPY |^MOVE |^LOCK |^UNLOCK =
     HTTP_METHODS_REGEXP_RESPONSE = %r=^(HTTP\/.*)$=
-    HTTP_REQUEST_TABLE = "http_request"
-    HTTP_RESPONSE_TABLE = "http_response"
+    HTTP_REQUEST_TABLE = "http_traffic_json"
+    HTTP_RESPONSE_TABLE = "http_traffic_json"
     
     # Misc
     SNAPLENGTH = 65536

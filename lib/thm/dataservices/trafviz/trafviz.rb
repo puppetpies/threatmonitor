@@ -9,6 +9,7 @@
 ########################################################################
 
 require 'keycounter'
+require 'json'
 
 class Keycounter
   
@@ -131,9 +132,12 @@ module Thm
       guid = Tools::guid
       cols, vals = String.new, String.new
       lkey, rkey = String.new, String.new
+      json_data_pieces = String.new
       t = 0
-      sql = "INSERT INTO #{reqtable} (guid,"
-      vals = "'#{guid}',"
+      json_data_hdr = "@json_template = { 'http' => { "
+      json_data_ftr = " } }"
+      sql = "INSERT INTO #{reqtable} (recv_time,recv_date,json_data) "
+      #vals = "'#{guid}',"
       data.each_line {|n|
         unless n.strip == ""
           if t > 0 # Don't processes GET / POST Line
@@ -146,8 +150,9 @@ module Thm
               rkey = "ommited"
             end
             if rkey.strip != "" or lkey.strip != ""
-              cols << "#{lkey},"
-              vals << "'#{rkey}',"
+              #cols << "#{lkey},"
+              #vals << "'#{rkey}',"
+              json_data_pieces << "'#{lkey}' => \"#{rkey}\",\n"
             end
             # Keycounter / HTTP Headers counter
             if @countheaders == true
@@ -172,15 +177,21 @@ module Thm
       }
       # SQL for Datastore
       begin
-        cols = "#{cols[0..cols.size - 2]}) "
-        vals = "#{vals[0..vals.size - 2]});"
-        sql = "#{sql}#{cols}VALUES (#{vals}"
+        #cols = "#{cols[0..cols.size - 2]}) "
+        #vals = "#{vals[0..vals.size - 2]});"
+        # Remove last , to fix hash table
+        json_data_pieces.sub!(%r{,\n$}, "")
+        json_eval = %Q{#{json_data_hdr}#{json_data_pieces}#{json_data_ftr}}
+        puts "JSON DATA: #{json_eval}"
+        eval(json_eval)
+        json_data = @json_template.to_json
+        sql = "#{sql} VALUES (NOW(), NOW(), '#{json_data}');"
         return sql
       rescue => e
         pp e
       end
     end
-
+    
     def text_highlighter(text)
       keys = ["Linux", "Java", "Android", "iPhone", "Mobile", "Chrome", 
               "Safari", "Mozilla", "Gecko", "AppleWebKit", "Windows", 
