@@ -8,55 +8,14 @@
 #
 ########################################################################
 
-require 'keycounter'
 require 'json'
-
-class Keycounter
-  
-  # Essentially custom def for this program
-  def keycount_createtablethm
-    fieldlst = Array.new
-    if File.exists?("/tmp/thmreadtable.txt")
-      File.open("/tmp/thmreadtable.txt", 'r') {|n|
-        n.each_line {|l|
-          fieldlst << ["#{l}"]
-        }
-      }
-    end
-    sql = "CREATE TABLE http_request (\n"
-    sql << "guid char(36),\n"
-    instance_variables.each {|n|
-      t = n.to_s.gsub("@", "").gsub("THM_")
-      fieldlst << ["#{t}"]
-    }
-    fieldlst.each {|n|
-      sql << "#{n} string,\n"
-    }
-    sql = sql[0..sql.size - 2]
-    sql << "\n);\n"
-    b = fieldlst.uniq.sort
-    pp b
-    File.open("/tmp/thmreadtable.txt", 'w') {|n|
-      b.each {|j|
-        n.puts(j)
-      }
-    }
-    puts "\e[4;36mCreate table:\e[0m\ \n #{sql}"
-  end
-  
-end
 
 module Thm
 
   class DataServices::Trafviz
-
-    attr_writer :countheaders
     
     def initialize
-      @k = Keycounter.new
-      @countheaders = false
       @debug = false
-      @snum = 0
     end
     
     def makeurl(data)
@@ -90,6 +49,7 @@ module Thm
       end
     end
     
+    # This is just an informal function when in debug mode
     def hit_header(hdrs)
       puts "Hit #{hdrs} header"
     end
@@ -137,7 +97,6 @@ module Thm
       json_data_hdr = "@json_template = { 'http' => { "
       json_data_ftr = " } }"
       sql = "INSERT INTO #{reqtable} (recv_time,recv_date,guid,json_data) "
-      #vals = "'#{guid}',"
       data.each_line {|n|
         unless n.strip == ""
           if t > 0 # Don't processes GET / POST Line
@@ -150,26 +109,7 @@ module Thm
               rkey = "ommited"
             end
             if rkey.strip != "" or lkey.strip != ""
-              #cols << "#{lkey},"
-              #vals << "'#{rkey}',"
-              json_data_pieces << "'#{lkey}' => \"#{rkey}\",\n"
-            end
-            # Keycounter / HTTP Headers counter
-            if @countheaders == true
-              # Keysamples: For Headers counter number of output lines to sample before exit.
-              # snum gets incremented so each request increments an instance variable to it keeps it position per request
-              if @snum < keysamples
-                if lkey != ""
-                  @k.keycount("THM_#{lkey}")
-                  @snum += 1
-                  puts "Sample ##{@snum} of ##{keysamples}" 
-                end
-              else
-                pp @k.keycount_compile
-                @k.keycount_createtablethm
-                puts "Real exit..."
-                exit
-              end
+              json_data_pieces << "'#{lkey}' => \"#{rkey.gsub('"', '')}\",\n"
             end
           end
           t += 1
@@ -177,16 +117,15 @@ module Thm
       }
       # SQL for Datastore
       begin
-        #cols = "#{cols[0..cols.size - 2]}) "
-        #vals = "#{vals[0..vals.size - 2]});"
         # Remove last , to fix hash table
         json_data_pieces.sub!(%r{,\n$}, "")
         json_eval = %Q{#{json_data_hdr}#{json_data_pieces}#{json_data_ftr}}
-        puts "JSON DATA: #{json_eval}"
-        eval(json_eval)
+        puts "\e[4;36mJSON Data:\e[0m\ \n#{json_eval}"
+        eval(json_eval) # Unsure why a local variable works for this in IRB
         json_data = @json_template.to_json
+        remove_instance_variable("@json_template") # Hence remove instance variable here
         # Added GUID as i could extend TCP/IP capture suites in the future for HTTP traffic 
-        sql = "#{sql} VALUES (NOW(), NOW(), '#{guid}', '#{json_data}');"
+        sql = "#{sql}VALUES (NOW(), NOW(), '#{guid}', '#{json_data}');"
         return sql
       rescue => e
         pp e
