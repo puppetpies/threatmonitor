@@ -136,7 +136,7 @@ module Thm
       t = 0
       json_data_hdr = "@json_template = { 'http' => { "
       json_data_ftr = " } }"
-      sql = "INSERT INTO #{reqtable} (recv_time,recv_date,json_data) "
+      sql = "INSERT INTO #{reqtable} (recv_time,recv_date,guid,json_data) "
       #vals = "'#{guid}',"
       data.each_line {|n|
         unless n.strip == ""
@@ -185,7 +185,8 @@ module Thm
         puts "JSON DATA: #{json_eval}"
         eval(json_eval)
         json_data = @json_template.to_json
-        sql = "#{sql} VALUES (NOW(), NOW(), '#{json_data}');"
+        # Added GUID as i could extend TCP/IP capture suites in the future for HTTP traffic 
+        sql = "#{sql} VALUES (NOW(), NOW(), '#{guid}', '#{json_data}');"
         return sql
       rescue => e
         pp e

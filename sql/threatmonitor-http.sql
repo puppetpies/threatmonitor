@@ -7,6 +7,7 @@ id INT GENERATED ALWAYS AS
            NO MINVALUE NO MAXVALUE
            CACHE 2 CYCLE
 ) primary key,
+  guid char(36),
   recv_date date,
   recv_time time,
   json_data JSON
