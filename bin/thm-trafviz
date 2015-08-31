@@ -46,7 +46,6 @@ end
 
 ARGV[0] = "--help" if ARGV[0] == nil
 @debug = false
-@countheaders = false
 banner = "\e[1;34mWelcome to Threatmonitor HTTP Traffic Visualizer \e[0m\ \n"
 banner << "\e[1;34m=================================================\e[0m\ \n\n"
 m = %Q{  
@@ -57,7 +56,6 @@ m = %Q{
 
 opts = GetoptLong.new(
   [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
-  [ '--countheaders', '-c', GetoptLong::NO_ARGUMENT ],
   [ '--interface', '-i', GetoptLong::OPTIONAL_ARGUMENT],
   [ '--snaplength', '-s', GetoptLong::OPTIONAL_ARGUMENT],
   [ '--debug', '-d', GetoptLong::NO_ARGUMENT ],
@@ -70,8 +68,6 @@ opts.each do |opt, arg|
 -h, --help:
    show help
    
--c, --countheaders - Count HTTP Header types ( Builds a create table statement )[ NO_ARGUMENT ]
-
 -i, --interface - Network Interface to collect measurements from [ OPTIONAL_ARGUMENT ]
 
 -s, --snaplength - Snaplength [ OPTIONAL_ARGUMENT ]
@@ -82,9 +78,6 @@ opts.each do |opt, arg|
       puts banner
       puts helper
       exit
-    when '--countheaders'
-      @countheaders = true
-      puts "Counters Enabled"
     when '--debug'
       @debug = true
     when '--interface'
@@ -98,7 +91,6 @@ puts banner
 
 # Trafviz DataServices
 tv = Thm::DataServices::Trafviz.new
-if defined?(@countheaders); tv.countheaders = true; end
 # Connect to Datastore
 gloc = Thm::DataServices::Geolocation.new
 gloc.datastore = DATASTORE
