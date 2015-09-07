@@ -4,7 +4,7 @@ module Thm #:nodoc:
 
     MAJOR = 0
     MINOR = 3
-    TINY = 1
+    TINY = 2
     CODENAME = "Micel"
 
     STRING = [MAJOR, MINOR, TINY].join('.')
