@@ -93,12 +93,12 @@ require 'git'
 Rake::Task["release"].clear
 task :release do
   version = "#{VERSION}"
-  #remote = 'origin'
-  #puts "Creating tag v#{version}"
-  #git = Git.open(".")
-  #git.add_tag("v#{version}")
-  #puts "Pushing tag to #{remote}"
-  #git.push(remote, 'master', true)
+  remote = 'origin'
+  puts "Creating tag v#{version}"
+  git = Git.open(".")
+  git.add_tag("v#{version}")
+  puts "Pushing tag to #{remote}"
+  git.push(remote, 'master', true)
   Rake::Task['gem'].invoke
   gemtask = Gem::Tasks::Push.new
   gemtask.push("pkg/thm-#{version}.gem")
