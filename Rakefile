@@ -23,6 +23,7 @@ Gem::Specification.new do |spec|
 
   spec.files = [
     "config.rb",
+    "Rakefile",
     "lib/thm/datalayerlight.rb",
     "thm-authentication.rb",
     "thm-authorization.rb",
