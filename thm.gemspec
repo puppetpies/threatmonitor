@@ -1,7 +1,6 @@
 # coding: utf-8
-lib = File.expand_path('../lib', __FILE__)
-$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-VERSION = "0.2.3"
+require './lib/thm/version.rb'
+VERSION = Thm::VERSION::STRING
 
 Gem::Specification.new do |spec|
   spec.name          = "thm"

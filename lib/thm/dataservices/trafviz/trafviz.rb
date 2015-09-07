@@ -15,7 +15,7 @@ module Thm
   class DataServices::Trafviz
     
     def initialize
-      @debug = false
+      @debug = true
     end
     
     def makeurl(data)
@@ -76,11 +76,11 @@ module Thm
     
     # Filter lkey = header, rkey = requestdata
     def lkey_strip(hdrs)
-      hdrs.split(":")[0].downcase.gsub("-", "").to_s.strip
+      hdrs.split(": ")[0].downcase.gsub("-", "").to_s.strip
     end
     
     def rkey_strip(data)
-      data.split(":")[1].to_s.gsub(",", "").gsub(";", "").gsub("=", "").strip
+      data.split(": ")[1].to_s.strip #to_s.gsub(",", "").gsub(";", "").gsub("=", "").strip
     end
     
     # Filter request data and build query
@@ -109,7 +109,10 @@ module Thm
               rkey = "ommited"
             end
             if rkey.strip != "" or lkey.strip != ""
-              json_data_pieces << "'#{lkey}' => \"#{rkey.gsub('"', '')}\",\n"
+              prerkeyins = rkey.gsub('"', '') # Strip Quotes
+              prerkeyins = "blank" if prerkeyins.strip == "" # Seems JSON values can't be "accept":""
+              puts "Found Blank Value!!!" if prerkeyins == "blank"
+              json_data_pieces << "'#{lkey}' => \"#{prerkeyins}\",\n"
             end
           end
           t += 1
