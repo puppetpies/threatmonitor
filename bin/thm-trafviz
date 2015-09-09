@@ -26,6 +26,16 @@ conf.thmhome?
 include Thm::Defaults
 include Tools
 
+class FalseClass
+
+  def []
+=begin
+#<NoMethodError: undefined method `[]' for false:FalseClass>
+=end
+  end
+  
+end
+
 class NilClass
 
   def strip
@@ -39,6 +49,18 @@ exception when looping over each packet loop: #<NoMethodError: undefined method 
 	from /usr/lib/ruby/gems/2.1.0/gems/pcap-0.7.7/lib/pcaplet.rb:94:in `loop'
 	from /usr/lib/ruby/gems/2.1.0/gems/pcap-0.7.7/lib/pcaplet.rb:94:in `each_packet'
 	from ./thm-httpseries:178:in `<main>'
+=end
+  end
+  
+  def >
+=begin
+exception when looping over each packet loop: #<NoMethodError: undefined method `>' for nil:NilClass>
+/data2/Projects/threatmonitor/lib/thm/dataservices/geolocation/geolocation.rb:47:in `block in define_component': undefined method `>' for nil:NilClass (NoMethodError)
+	from /data2/Projects/threatmonitor/lib/thm/dataservices/geolocation/geolocation.rb:73:in `geoiplookup'
+	from ./thm-trafviz:284:in `block in <main>'
+	from /usr/lib/ruby/gems/2.1.0/gems/pcap-0.7.7/lib/pcaplet.rb:94:in `loop'
+	from /usr/lib/ruby/gems/2.1.0/gems/pcap-0.7.7/lib/pcaplet.rb:94:in `each_packet'
+	from ./thm-trafviz:271:in `<main>'
 =end
   end
   
