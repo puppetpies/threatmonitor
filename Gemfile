@@ -19,4 +19,5 @@ gem 'rake', '>= 0.9.2'
 gem 'rake-compiler', '>= 0.6.0'
 gem 'rubygems-tasks'
 gem 'git'
-
+gem 'keycounter'
+gem 'walltime'
