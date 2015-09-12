@@ -20,12 +20,24 @@ BEGIN
 END;
 
 /*
-SELECT JSON_SQUASH(host) AS host, 
-JSON_SQUASH(referer) AS referer 
+EXPLAIN SELECT 
+JSON_SQUASH(host) AS host, 
+JSON_SQUASH(acceptlanguage) as acceptlanguage,
+JSON_SQUASH(acceptencoding) as acceptencoding,
+JSON_SQUASH(useragent) as useragent,
+JSON_SQUASH(referer) AS referer
 FROM 
 (SELECT 
-json.filter(json_data, '$.http.host') AS host, 
+json.filter(json_data, '$.http.host') AS host,
+json.filter(json_data, '$.http.acceptlanguage') AS acceptlanguage,
+json.filter(json_data, '$.http.acceptencoding') AS acceptencoding,
+json.filter(json_data, '$.http.useragent') AS useragent, 
 json.filter(json_data, '$.http.referer') AS referer 
-FROM http_traffic_json) AS origin
-LIMIT 10;
+FROM http_traffic_json) AS origin 
+GROUP BY useragent, host, acceptlanguage, acceptencoding, referer;
 */
+
+/*
+SELECT MIN(json_data) FROM http_traffic_json
+*/
+
