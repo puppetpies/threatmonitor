@@ -54,7 +54,7 @@ module Thm
             while row = resgeo.fetch_hash do
               populategeo = instance_variable_get("@#{name_func}_name")
               populategeo << row["#{name_func}_name"].to_s
-              instance_variable_set("@#{name_func}_name", populategeo)
+              instance_variable_set("@#{name_func}_name", populategeo) # Only returns 1 row
               @continent_name = row["continent_name"].to_s
             end
           rescue => e
