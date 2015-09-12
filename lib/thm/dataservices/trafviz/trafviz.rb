@@ -9,13 +9,32 @@
 ########################################################################
 
 require 'json'
+require 'walltime'
+
+module TimeWarp
+
+  refine Stopwatch do
+
+    def print_stats
+      round = round_to(@t2 - @t1, 2)
+      puts "Start: #{Time.at(@t1)} Finish: #{Time.at(@t2)} Total time: #{round}"
+      diff = (Time.at(@t2) - Time.at(@t1))*1000
+      puts "Difference: #{diff.to_s.gsub(".", "")[0..2]}ms"
+    end
+    
+  end
+
+end
 
 module Thm
-
+    
   class DataServices::Trafviz
     
+    # For refinement of print_stats 
+    using TimeWarp
+    
     def initialize
-      @debug = true
+      @debug = false
     end
     
     def makeurl(data)
@@ -50,19 +69,23 @@ module Thm
     end
     
     # This is just an informal function when in debug mode
-    def hit_header(hdrs)
-      puts "Hit #{hdrs} header"
+    def hit_header(hdrs, comment="")
+      puts "Hit #{hdrs} header #{comment}"
     end
     
     # Cookie ommit as we don't want to steal cookie data and pointless to store.
+    # Other useless headers / slight issues
     def filter_header?(lkey)
       puts "MY LKEY: |#{lkey}|" if @debug == true
-      case lkey.strip
-      when "cookie"
+      case 
+      when lkey == "cookie"
         hit_header(lkey) if @debug == true
         return true
-      when "range"
+      when lkey == "range"
         hit_header(lkey) if @debug == true
+        return true
+      when lkey =~ /^get |^post /
+        hit_heaer(lkey, "Seen this unsure why it even occurs yet !") if @debug == true
         return true
       else
         return false
@@ -89,6 +112,8 @@ module Thm
         sql = "SELECT 1;"
         return sql
       end
+      flt = Stopwatch.new
+      flt.watch('start')
       guid = Tools::guid
       cols, vals = String.new, String.new
       lkey, rkey = String.new, String.new
@@ -129,6 +154,9 @@ module Thm
         remove_instance_variable("@json_template") # Hence remove instance variable here
         # Added GUID as i could extend TCP/IP capture suites in the future for HTTP traffic 
         sql = "#{sql}VALUES (NOW(), NOW(), '#{guid}', '#{json_data}');"
+        flt.watch('stop')
+        print "\e[4;36mFilter Time Taken:\e[0m\ "
+        flt.print_stats
         return sql
       rescue => e
         pp e
@@ -140,7 +168,7 @@ module Thm
               "Safari", "Mozilla", "Gecko", "AppleWebKit", "Windows", 
               "MSIE", "Win64", "Trident", "wispr", "PHPSESSID", "JSESSIONID",
               "AMD64", "Darwin", "Macintosh", "Mac OS X", "Dalvik", "text/html", "xml"]
-      cpicker = [2,3,4,1,7,5,6]
+      cpicker = [2,3,4,1,7,5,6] # Just a selection of colours
       keys.each {|n|
         text.gsub!("#{n}", "\e[4;3#{cpicker[rand(cpicker.size)]}m#{n}\e[0m\ \e[0;32m".strip)
       }
