@@ -52,7 +52,7 @@ exception when looping over each packet loop: #<NoMethodError: undefined method 
 =end
   end
   
-  def >
+  def > name=nil
 =begin
 exception when looping over each packet loop: #<NoMethodError: undefined method `>' for nil:NilClass>
 /data2/Projects/threatmonitor/lib/thm/dataservices/geolocation/geolocation.rb:47:in `block in define_component': undefined method `>' for nil:NilClass (NoMethodError)
