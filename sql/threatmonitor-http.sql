@@ -51,16 +51,16 @@ CREATE VIEW traffic_view_5mins AS (SELECT
 recv_date,
 recv_time,
 JSON_SQUASH(host) AS host, 
-JSON_SQUASH(acceptlanguage) as acceptlanguage,
-JSON_SQUASH(referer) as referer,
+JSON_SQUASH(acceptlanguage) AS acceptlanguage,
+JSON_SQUASH(referer) AS referer,
 family,
 major,
 minor,
 os
 FROM 
 (SELECT
-a.recv_date as recv_date,
-a.recv_time as recv_time,
+a.recv_date AS recv_date,
+a.recv_time AS recv_time,
 json.filter(json_data, '$.http.host') AS host,
 json.filter(json_data, '$.http.acceptlanguage') AS acceptlanguage,
 json.filter(json_data, '$.http.acceptencoding') AS acceptencoding,
@@ -76,16 +76,16 @@ CREATE VIEW traffic_view_15mins AS (SELECT
 recv_date,
 recv_time,
 JSON_SQUASH(host) AS host, 
-JSON_SQUASH(acceptlanguage) as acceptlanguage,
-JSON_SQUASH(referer) as referer,
+JSON_SQUASH(acceptlanguage) AS acceptlanguage,
+JSON_SQUASH(referer) AS referer,
 family,
 major,
 minor,
 os
 FROM 
 (SELECT
-a.recv_date as recv_date,
-a.recv_time as recv_time,
+a.recv_date AS recv_date,
+a.recv_time AS recv_time,
 json.filter(json_data, '$.http.host') AS host,
 json.filter(json_data, '$.http.acceptlanguage') AS acceptlanguage,
 json.filter(json_data, '$.http.acceptencoding') AS acceptencoding,
@@ -101,16 +101,16 @@ CREATE VIEW traffic_view_30mins AS (SELECT
 recv_date,
 recv_time,
 JSON_SQUASH(host) AS host, 
-JSON_SQUASH(acceptlanguage) as acceptlanguage,
-JSON_SQUASH(referer) as referer,
+JSON_SQUASH(acceptlanguage) AS acceptlanguage,
+JSON_SQUASH(referer) AS referer,
 family,
 major,
 minor,
 os
 FROM 
 (SELECT
-a.recv_date as recv_date,
-a.recv_time as recv_time,
+a.recv_date AS recv_date,
+a.recv_time AS recv_time,
 json.filter(json_data, '$.http.host') AS host,
 json.filter(json_data, '$.http.acceptlanguage') AS acceptlanguage,
 json.filter(json_data, '$.http.acceptencoding') AS acceptencoding,
