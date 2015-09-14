@@ -8,6 +8,7 @@
 #
 ########################################################################
 
+require 'pp'
 require 'json'
 require 'walltime'
 
@@ -30,11 +31,14 @@ module Thm
     
   class DataServices::Trafviz
     
+    attr_writer :reqtable, :reqtableua
+    
     # For refinement of print_stats 
     using TimeWarp
     
     def initialize
       @debug = false
+      @reqtable, @reqtableua = String.new, String.new
     end
     
     def makeurl(data)
@@ -73,6 +77,7 @@ module Thm
       puts "Hit #{hdrs} header #{comment}"
     end
     
+    
     # Cookie ommit as we don't want to steal cookie data and pointless to store.
     # Other useless headers / slight issues
     def filter_header?(lkey)
@@ -107,7 +112,7 @@ module Thm
     end
     
     # Filter request data and build query
-    def request_filter(reqtable, data, keysamples=2000)
+    def request_filter(data, keysamples=2000)
       if !request_valid?(data)
         sql = "SELECT 1;"
         return sql
@@ -117,11 +122,12 @@ module Thm
       guid = Tools::guid
       cols, vals = String.new, String.new
       lkey, rkey = String.new, String.new
+      sql_ua = String.new
       json_data_pieces = String.new
       t = 0
       json_data_hdr = "@json_template = { 'http' => { "
       json_data_ftr = " } }"
-      sql = "INSERT INTO #{reqtable} (recv_time,recv_date,guid,json_data) "
+      sql = "INSERT INTO #{@reqtable} (recv_time,recv_date,guid,json_data) "
       data.each_line {|n|
         unless n.strip == ""
           if t > 0 # Don't processes GET / POST Line
@@ -130,14 +136,25 @@ module Thm
             rkeyenc = filter_header?(lkey)
             if rkeyenc == false
               rkeyenc = rkey_decode(rkey)
+              if lkey == "useragent"
+                ua = Tools::ua_parser(rkeyenc)
+                sql_ua = "INSERT INTO #{@reqtableua} (family, "
+                sql_ua << "major, minor, " unless ua.version == nil
+                sql_ua << "os, guid) "
+                sql_ua << "VALUES ('#{ua.family}', "
+                sql_ua << "'#{ua.version.major}', '#{ua.version.minor}', " unless ua.version == nil
+                sql_ua << "'#{ua.os.to_s}', '#{guid}');"
+              end
             else 
               rkey = "ommited"
             end
-            if rkey.strip != "" or lkey.strip != ""
+            if rkey != "" or lkey != ""
               prerkeyins = rkey.gsub('"', '') # Strip Quotes
               prerkeyins = "blank" if prerkeyins.strip == "" # Seems JSON values can't be "accept":""
               puts "Found Blank Value!!!" if prerkeyins == "blank"
-              json_data_pieces << "'#{lkey}' => \"#{prerkeyins}\",\n"
+              if lkey != "useragent"
+                json_data_pieces << "'#{lkey}' => \"#{prerkeyins}\",\n"
+              end
             end
           end
           t += 1
@@ -157,7 +174,7 @@ module Thm
         flt.watch('stop')
         print "\e[4;36mFilter Time Taken:\e[0m\ "
         flt.print_stats
-        return sql
+        return [sql, sql_ua]
       rescue => e
         pp e
       end
