@@ -30,6 +30,7 @@ module Thm
     HTTP_METHODS_REGEXP_RESPONSE = %r=^(HTTP\/.*)$=
     HTTP_REQUEST_TABLE = "http_traffic_json"
     HTTP_RESPONSE_TABLE = "http_traffic_json"
+    HTTP_REQUEST_TABLE_UA = "http_traffic_ua"
     
     # Misc
     SNAPLENGTH = 65536
