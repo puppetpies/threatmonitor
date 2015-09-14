@@ -16,12 +16,8 @@ require 'guid'
 require 'yaml'
 require 'pcaplet'
 require 'pcaprub' # For Live capture / write
+require 'user_agent_parser'
 include Pcap
-
-# TODO
-#
-# Create def's for that packet SQL / Refactor to provent code duplication
-# Create def's for Hash table YAML same idea as above.
 
 class String
 
@@ -34,11 +30,20 @@ end
 module Tools
 
   class << self
-  
+    
+    # Guid.new isn't hard but this Module will expand
     def guid
       guid = Guid.new # Generate GUID
     end
-
+    
+    # User agent parsing magic for Trafviz via uap-ruby on Github
+    def ua_parser(agent)
+      # Load all user agent data / regexp / patterns once
+      @ua ||= UserAgentParser::Parser.new
+      @ua.parse(agent)
+    end
+    
+    # Thm system errors
     def log_errors(file, data)
       File.open("#{file}", 'a') {|n|
         n.puts("#{data}")
@@ -47,6 +52,7 @@ module Tools
     
   end
 
+  # User defined functions
   def use_const_defined_unless?(const)
     const_down = const.downcase
     if Kernel.const_defined?("#{const}")
@@ -68,7 +74,7 @@ end
 require File.expand_path(File.join(
         File.dirname(__FILE__),
         "../lib/thm/datalayerlight.rb"))
-          
+
 # Load Datasources / Services contains defaults
 require File.expand_path(File.join(
         File.dirname(__FILE__),
