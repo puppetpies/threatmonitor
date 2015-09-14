@@ -32,24 +32,35 @@ id INT GENERATED ALWAYS AS
   guid CHAR(36) NOT NULL
 );
 
+CREATE INDEX index_traffic_ua_id ON "threatmonitor".http_traffic_ua(id);
+CREATE INDEX index_traffic_ua_guid ON "threatmonitor".http_traffic_ua(guid);
+
+DROP FUNCTION JSON_SQUASH;
 CREATE FUNCTION JSON_SQUASH(name string)
 RETURNS string
 BEGIN
-  RETURN REPLACE(REPLACE(REPLACE(name, '[\"', ''), '\"]', ''), '"', '');
+  DECLARE res STRING;
+  SET res = REPLACE(REPLACE(REPLACE(name, '[\"', ''), '\"]', ''), '"', '');
+  IF (res = '[]') THEN
+    SET res = REPLACE(res, '[]', '<no data>');
+  END IF;
+  RETURN res;
 END;
 
-/*
-PLAN SELECT 
+CREATE VIEW traffic_view_5mins AS (SELECT
+recv_date,
+recv_time,
 JSON_SQUASH(host) AS host, 
 JSON_SQUASH(acceptlanguage) as acceptlanguage,
-JSON_SQUASH(acceptencoding) as acceptencoding,
 JSON_SQUASH(referer) as referer,
 family,
 major,
 minor,
 os
 FROM 
-(SELECT 
+(SELECT
+a.recv_date as recv_date,
+a.recv_time as recv_time,
 json.filter(json_data, '$.http.host') AS host,
 json.filter(json_data, '$.http.acceptlanguage') AS acceptlanguage,
 json.filter(json_data, '$.http.acceptencoding') AS acceptencoding,
@@ -59,9 +70,57 @@ b.major,
 b.minor,
 b.os
 FROM http_traffic_json a JOIN http_traffic_ua b 
-ON (a.guid = b.guid)) AS origin WHERE referer ILIKE '%http://%' LIMIT 30;
-*/
+ON (a.guid = b.guid)) AS origin WHERE recv_time BETWEEN CURTIME() - 300 AND CURTIME());
 
+CREATE VIEW traffic_view_15mins AS (SELECT
+recv_date,
+recv_time,
+JSON_SQUASH(host) AS host, 
+JSON_SQUASH(acceptlanguage) as acceptlanguage,
+JSON_SQUASH(referer) as referer,
+family,
+major,
+minor,
+os
+FROM 
+(SELECT
+a.recv_date as recv_date,
+a.recv_time as recv_time,
+json.filter(json_data, '$.http.host') AS host,
+json.filter(json_data, '$.http.acceptlanguage') AS acceptlanguage,
+json.filter(json_data, '$.http.acceptencoding') AS acceptencoding,
+json.filter(json_data, '$.http.referer') AS referer,
+b.family,
+b.major,
+b.minor,
+b.os
+FROM http_traffic_json a JOIN http_traffic_ua b 
+ON (a.guid = b.guid)) AS origin WHERE recv_time BETWEEN CURTIME() - 900 AND CURTIME());
+
+CREATE VIEW traffic_view_30mins AS (SELECT
+recv_date,
+recv_time,
+JSON_SQUASH(host) AS host, 
+JSON_SQUASH(acceptlanguage) as acceptlanguage,
+JSON_SQUASH(referer) as referer,
+family,
+major,
+minor,
+os
+FROM 
+(SELECT
+a.recv_date as recv_date,
+a.recv_time as recv_time,
+json.filter(json_data, '$.http.host') AS host,
+json.filter(json_data, '$.http.acceptlanguage') AS acceptlanguage,
+json.filter(json_data, '$.http.acceptencoding') AS acceptencoding,
+json.filter(json_data, '$.http.referer') AS referer,
+b.family,
+b.major,
+b.minor,
+b.os
+FROM http_traffic_json a JOIN http_traffic_ua b 
+ON (a.guid = b.guid)) AS origin WHERE recv_time BETWEEN CURTIME() - 1800 AND CURTIME());
 /*
 SELECT MIN(json_data) FROM http_traffic_json
 */
