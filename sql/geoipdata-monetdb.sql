@@ -7,6 +7,8 @@
 --           CACHE 2 CYCLE
 -- ) primary key,
 
+SET SCHEMA "threatmonitor";
+
 DROP TABLE "threatmonitor".geoipdata_ipv4blocks_city;
 CREATE TABLE "threatmonitor".geoipdata_ipv4blocks_city (
   network varchar(18) NOT NULL,
