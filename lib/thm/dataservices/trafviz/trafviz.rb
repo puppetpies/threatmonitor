@@ -50,7 +50,7 @@ module Thm
       data.each_line {|n|
         if n.split(":")[0] == "Host"
           hostn = n.split(":")[1].strip
-        elsif n.split(" ")[0] == "GET"
+        elsif n.split(" ")[0] =~ /^GET|^HEAD/
           requestn = n.split(" ")[1]
         end
       }
