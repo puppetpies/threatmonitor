@@ -115,12 +115,12 @@ module Thm
     
     # Filter request data and build query
     def request_filter(data, keysamples=2000)
+      flt = Stopwatch.new
+      flt.watch('start')
       if !request_valid?(data)
         sql = "SELECT 1;"
         return sql
       end
-      flt = Stopwatch.new
-      flt.watch('start')
       guid = Tools::guid
       cols, vals = String.new, String.new
       lkey, rkey = String.new, String.new
