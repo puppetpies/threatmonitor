@@ -45,10 +45,9 @@ module Thm
     def makeurl(data)
       if !request_valid?(data)
         return false
-      end
-      hdrs = data
+      end 
       hostn, requestn = ""
-      hdrs.each_line {|n|
+      data.each_line {|n|
         if n.split(":")[0] == "Host"
           hostn = n.split(":")[1].strip
         elsif n.split(" ")[0] == "GET"
@@ -76,7 +75,7 @@ module Thm
     
     # This is just an informal function when in debug mode
     def hit_header(hdrs, comment="")
-      puts "Hit #{hdrs} header #{comment}"
+      puts "Hit: #{hdrs} Header comment: #{comment}"
     end
     
     
