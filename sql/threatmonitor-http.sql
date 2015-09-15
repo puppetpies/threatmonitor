@@ -47,10 +47,12 @@ BEGIN
   RETURN res;
 END;
 
+DROP VIEW traffic_view_5mins;
 CREATE VIEW traffic_view_5mins AS (SELECT
 recv_date,
 recv_time,
-JSON_SQUASH(host) AS host, 
+JSON_SQUASH(hostname) AS hostname,
+JSON_SQUASH(url) AS url,
 JSON_SQUASH(acceptlanguage) AS acceptlanguage,
 JSON_SQUASH(referer) AS referer,
 family,
@@ -61,7 +63,8 @@ FROM
 (SELECT
 a.recv_date AS recv_date,
 a.recv_time AS recv_time,
-json.filter(json_data, '$.http.host') AS host,
+json.filter(json_data, '$.http.host') AS hostname,
+json.filter(json_data, '$.http.url') AS url,
 json.filter(json_data, '$.http.acceptlanguage') AS acceptlanguage,
 json.filter(json_data, '$.http.acceptencoding') AS acceptencoding,
 json.filter(json_data, '$.http.referer') AS referer,
@@ -72,10 +75,12 @@ b.os
 FROM http_traffic_json a JOIN http_traffic_ua b 
 ON (a.guid = b.guid)) AS origin WHERE recv_time BETWEEN CURTIME() - 300 AND CURTIME());
 
+DROP VIEW traffic_view_15mins;
 CREATE VIEW traffic_view_15mins AS (SELECT
 recv_date,
 recv_time,
-JSON_SQUASH(host) AS host, 
+JSON_SQUASH(hostname) AS hostname,
+JSON_SQUASH(url) AS url,
 JSON_SQUASH(acceptlanguage) AS acceptlanguage,
 JSON_SQUASH(referer) AS referer,
 family,
@@ -86,7 +91,8 @@ FROM
 (SELECT
 a.recv_date AS recv_date,
 a.recv_time AS recv_time,
-json.filter(json_data, '$.http.host') AS host,
+json.filter(json_data, '$.http.host') AS hostname,
+json.filter(json_data, '$.http.url') AS url,
 json.filter(json_data, '$.http.acceptlanguage') AS acceptlanguage,
 json.filter(json_data, '$.http.acceptencoding') AS acceptencoding,
 json.filter(json_data, '$.http.referer') AS referer,
@@ -97,10 +103,12 @@ b.os
 FROM http_traffic_json a JOIN http_traffic_ua b 
 ON (a.guid = b.guid)) AS origin WHERE recv_time BETWEEN CURTIME() - 900 AND CURTIME());
 
+DROP VIEW traffic_view_30mins;
 CREATE VIEW traffic_view_30mins AS (SELECT
 recv_date,
 recv_time,
-JSON_SQUASH(host) AS host, 
+JSON_SQUASH(hostname) AS hostname,
+JSON_SQUASH(url) AS url,
 JSON_SQUASH(acceptlanguage) AS acceptlanguage,
 JSON_SQUASH(referer) AS referer,
 family,
@@ -111,7 +119,8 @@ FROM
 (SELECT
 a.recv_date AS recv_date,
 a.recv_time AS recv_time,
-json.filter(json_data, '$.http.host') AS host,
+json.filter(json_data, '$.http.host') AS hostname,
+json.filter(json_data, '$.http.url') AS url,
 json.filter(json_data, '$.http.acceptlanguage') AS acceptlanguage,
 json.filter(json_data, '$.http.acceptencoding') AS acceptencoding,
 json.filter(json_data, '$.http.referer') AS referer,
@@ -121,6 +130,7 @@ b.minor,
 b.os
 FROM http_traffic_json a JOIN http_traffic_ua b 
 ON (a.guid = b.guid)) AS origin WHERE recv_time BETWEEN CURTIME() - 1800 AND CURTIME());
+
 /*
 SELECT MIN(json_data) FROM http_traffic_json
 */
