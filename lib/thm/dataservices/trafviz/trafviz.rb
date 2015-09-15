@@ -39,6 +39,7 @@ module Thm
     def initialize
       @debug = false
       @reqtable, @reqtableua = String.new, String.new
+      @makeurl = String.new
     end
     
     def makeurl(data)
@@ -54,6 +55,7 @@ module Thm
           requestn = n.split(" ")[1]
         end
       }
+      @makeurl = "http://#{hostn}#{requestn}"
       puts "\e[1;37mURL: http://#{hostn}#{requestn} \e[0m\ "
     end
 
@@ -152,14 +154,14 @@ module Thm
               prerkeyins = rkey.gsub('"', '') # Strip Quotes
               prerkeyins = "blank" if prerkeyins.strip == "" # Seems JSON values can't be "accept":""
               puts "Found Blank Value!!!" if prerkeyins == "blank"
-              if lkey != "useragent"
-                json_data_pieces << "'#{lkey}' => \"#{prerkeyins}\",\n"
-              end
+              json_data_pieces << "'#{lkey}' => \"#{prerkeyins}\",\n" if lkey != "useragent"
             end
           end
           t += 1
         end
       }
+      # Store the URL in the JSON unless its blank
+      json_data_pieces << "'url' => \"#{@makeurl}\",\n" unless @makeurl == ""
       # SQL for Datastore
       begin
         # Remove last , to fix hash table
