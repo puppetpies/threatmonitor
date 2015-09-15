@@ -7,6 +7,7 @@
 # Database Connectivity Essential to the project
 #
 ########################################################################
+require 'keycounter'
 
 module DatalayerLight
 
@@ -14,7 +15,7 @@ module DatalayerLight
     
     require 'MonetDB'
     
-    attr_writer :hostname, :username, :password, :port, :debug, :autocommit
+    attr_writer :hostname, :username, :password, :port, :debug, :autocommit, :autocommitvalue
     attr_accessor :dbname
     
     def initialize
@@ -24,7 +25,9 @@ module DatalayerLight
       @port = 50000
       @dbname = "demo"
       @debug = 1
-      @autocommit = true
+      @autocommit = false
+      @autocommitvalue = 100
+      @k = Keycounter.new
     end
 
     def connect
@@ -64,16 +67,22 @@ module DatalayerLight
     
     def commit
       @db.query("COMMIT;")
+      @k.keycount_reset("COMMITCOUNTER")
+      puts "Syncing data to disk..."
     end
     
     def query(sql)
       @res = @db.query("#{sql};")
+      print "COMMIT COUNTER: " if @debug == 1
+      @k.keycount("COMMITCOUNTER")
+      pp @k.keycount_reader("COMMITCOUNTER") if @debug == 1
+      commit if @k.keycount_reader("COMMITCOUNTER") == @autocommitvalue
       if @debug == 1; puts "#{sql}"; end
       return @res
     end
     
     def free
-    @res.free
+      @res.free
     end
     
     def close
@@ -87,7 +96,7 @@ module DatalayerLight
     
     require 'mysql'
     
-    attr_writer :hostname, :username, :password, :port, :debug, :autocommit
+    attr_writer :hostname, :username, :password, :port, :debug, :autocommit, :autocommitvalue
     attr_accessor :dbname
     
     def initialize
@@ -97,7 +106,9 @@ module DatalayerLight
       @port = 3306
       @dbname = "test"
       @debug = 1
-      @autocommit = true
+      @autocommit = false
+      @autocommitvalue = 100
+      @k = Keycounter.new
     end
 
     def connect
@@ -120,6 +131,10 @@ module DatalayerLight
     def query(sql)
       begin
         @res = @db.query("#{sql;}")
+        print "COMMIT COUNTER: " if @debug == 1
+        @k.keycount("COMMITCOUNTER")
+        pp @k.keycount_reader("COMMITCOUNTER") if @debug == 1
+        commit if @k.keycount_reader("COMMITCOUNTER") == @autocommitvalue
         if @debug == true; puts "#{sql}"; end
         return @res
       rescue Mysql::Error => e
@@ -133,6 +148,8 @@ module DatalayerLight
     
     def commit
       @db.commit
+      @k.keycount_reset("COMMITCOUNTER")
+      puts "Syncing data to disk..."
     end
     
     def close

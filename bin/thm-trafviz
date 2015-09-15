@@ -118,8 +118,8 @@ tv.reqtableua = HTTP_REQUEST_TABLE_UA
 # Connect to Datastore
 gloc = Thm::DataServices::Geolocation.new
 gloc.datastore = DATASTORE
-gloc.debug = false
-gloc.autocommit = true
+gloc.debug = 1
+gloc.autocommit = false
 gloc.dbhost = DBHOST
 gloc.dbuser = DBUSER
 gloc.dbpass = DBPASS
