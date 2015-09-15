@@ -319,7 +319,7 @@ HTTP_RESPONSE = Pcap::Filter.new('tcp src portrange 1024-65535', @trafviz.captur
             end
           }
         rescue
-          Tools::log_errors("/tmp/thm-sql-errors.log", "SQL Error - #{Time.now} - #{query_return_sql}") # Catch them all
+          Tools::log_errors("/tmp/thm-sql-errors.log", "SQL Error - #{Time.now} - #{query_return_sql}") unless query_return_sql == "SELECT 1;"
         end
         stwt.watch('stop')
         stwt.print_stats
