@@ -71,6 +71,10 @@ module Thm
       res = @conn.query("#{sql}")
     end
 
+    def commit
+      @conn.commit
+    end
+    
   end
 
 end
