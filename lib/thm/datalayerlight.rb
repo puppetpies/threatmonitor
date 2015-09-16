@@ -24,7 +24,7 @@ module DatalayerLight
       @password = "monetdb"
       @port = 50000
       @dbname = "demo"
-      @debug = 1
+      @debug = 0
       @autocommit = false
       @autocommitvalue = 100
       @k = Keycounter.new
@@ -105,7 +105,7 @@ module DatalayerLight
       @password = ""
       @port = 3306
       @dbname = "test"
-      @debug = 1
+      @debug = 0
       @autocommit = false
       @autocommitvalue = 100
       @k = Keycounter.new
