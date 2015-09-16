@@ -287,10 +287,6 @@ end
 a.menu!
 =end
 
-at_exit {
-  Thm::DataServices::Trafviz::Main.new
-}
-
 @trafviz = Pcaplet.new(startup)
 HTTP_REQUEST = Pcap::Filter.new('tcp dst port 80', @trafviz.capture)
 HTTP_RESPONSE = Pcap::Filter.new('tcp src portrange 1024-65535', @trafviz.capture)
@@ -342,12 +338,11 @@ HTTP_RESPONSE = Pcap::Filter.new('tcp src portrange 1024-65535', @trafviz.captur
       end
     end
   puts s.gsub("GET", "\e[1;36mGET\e[0m").gsub("POST", "\e[1;36mPOST\e[0m") if s
+  
   # Just so we don't loose any data between commits on exiting...
-
   trap("INT") {
     gloc.commit
     exit
-    #@trafviz.close
   }
 
 }
