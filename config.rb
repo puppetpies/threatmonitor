@@ -35,6 +35,12 @@ module Thm
     # Misc
     SNAPLENGTH = 65536
     INTERFACE = "eth0"
+    
+    # Google Safe Browsing API
+    SAFEBROWSING_ENABLED = false
+    SAFEBROWSING_API_KEY = "12345"
+    GOOGLE_API_PROJECTNAME = "myproject"
+    SAFEBROWSING_URL = "https://sb-ssl.google.com/safebrowsing/api/lookup?client=#{GOOGLE_API_PROJECTNAME}&key=#{SAFEBROWSING_API_KEY}&appver=1.5.2&pver=3.1&url="
 
   end
 
