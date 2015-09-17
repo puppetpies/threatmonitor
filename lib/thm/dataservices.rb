@@ -79,6 +79,7 @@ module Thm
 
 end
 
+require_relative 'dataservices/external.rb'
 require_relative 'dataservices/trafviz/trafviz.rb'
 require_relative 'dataservices/geolocation/geolocation.rb'
 
