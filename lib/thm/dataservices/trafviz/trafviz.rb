@@ -78,7 +78,6 @@ module Thm
       puts "Hit: #{hdrs} Header comment: #{comment}"
     end
     
-    
     # Cookie ommit as we don't want to steal cookie data and pointless to store.
     # Other useless headers / slight issues
     def filter_header?(lkey)
