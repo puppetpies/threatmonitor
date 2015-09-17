@@ -42,6 +42,10 @@ module Thm
     GOOGLE_API_PROJECTNAME = "myproject"
     SAFEBROWSING_URL = "https://sb-ssl.google.com/safebrowsing/api/lookup?client=#{GOOGLE_API_PROJECTNAME}&key=#{SAFEBROWSING_API_KEY}&appver=1.5.2&pver=3.1&url="
 
+    GEOCODING_ENABLED = false
+    GEOCODING_API_KEY = "12345"
+    GEOCODING_URL = "https://maps.googleapis.com/maps/api/geocode/json?key=#{GEOCODING_API_KEY}&" # Format: "latlng=40.714224,-73.961452"
+    
   end
 
 end
