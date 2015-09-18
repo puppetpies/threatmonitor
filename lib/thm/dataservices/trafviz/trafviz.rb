@@ -31,7 +31,7 @@ module Thm
     
   class DataServices::Trafviz
     
-    attr_writer :reqtable, :reqtableua
+    attr_writer :reqtable, :reqtableua, :debug
     
     # For refinement of print_stats 
     using TimeWarp
@@ -90,7 +90,7 @@ module Thm
         hit_header(lkey) if @debug == true
         return true
       when lkey =~ /^get |^post /
-        hit_heaer(lkey, "Seen this unsure why it even occurs yet !") if @debug == true
+        hit_header(lkey, "Seen this unsure why it even occurs yet !") if @debug == true
         return true
       else
         return false
