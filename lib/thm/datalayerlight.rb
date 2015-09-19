@@ -65,19 +65,42 @@ module DatalayerLight
       @db.auto_commit?
     end
     
+    def rollback
+      begin
+        @db.query("ROLLBACK;")
+        puts "Rollback sucess !!!"
+      rescue MonetDBQueryError # Worse case scenario
+        puts "Something went wrong"
+        @db.free
+        @db.close
+        puts "Exiting ..."
+        puts "Bye!"
+        exit
+      end
+    end
+    
     def commit
-      @db.query("COMMIT;")
-      @k.keycount_reset("COMMITCOUNTER")
-      puts "Syncing data to disk..."
+      begin
+        @db.query("COMMIT;")
+        @k.keycount_reset("COMMITCOUNTER")
+        puts "Syncing data to disk..."
+      rescue MonetDBQueryError
+        puts "Atempting Rollback..."
+        rollback
+      end
     end
     
     def query(sql)
-      @res = @db.query("#{sql};")
-      print "COMMIT COUNTER: " if @debug == 1
-      @k.keycount("COMMITCOUNTER")
-      pp @k.keycount_reader("COMMITCOUNTER") if @debug == 1
-      commit if @k.keycount_reader("COMMITCOUNTER") == @autocommitvalue
-      if @debug == 1; puts "#{sql}"; end
+      begin
+        @res = @db.query("#{sql};")
+        print "COMMIT COUNTER: " if @debug == 1
+        @k.keycount("COMMITCOUNTER")
+        pp @k.keycount_reader("COMMITCOUNTER") if @debug == 1
+        commit if @k.keycount_reader("COMMITCOUNTER") == @autocommitvalue
+        if @debug == 1; puts "#{sql}"; end
+      rescue MonetDBQueryError
+        rollback
+      end
       return @res
     end
     
