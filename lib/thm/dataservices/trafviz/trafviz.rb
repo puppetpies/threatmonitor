@@ -159,6 +159,7 @@ module Thm
         end
       }
       # Store the URL in the JSON unless its blank
+      # Build JSON Manually as i bet its faster than using some JSON encoder where it has to convert from Array etc.
       json_data_pieces << "'url' => \"#{@makeurl}\",\n" unless @makeurl == ""
       # SQL for Datastore
       begin
