@@ -113,6 +113,7 @@ puts banner
 
 # Trafviz DataServices
 tv = Thm::DataServices::Trafviz.new
+tv.debug = @debug
 tv.reqtable = HTTP_REQUEST_TABLE
 tv.reqtableua = HTTP_REQUEST_TABLE_UA
 # Connect to Datastore
