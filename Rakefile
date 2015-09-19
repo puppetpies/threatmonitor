@@ -44,6 +44,7 @@ Gem::Specification.new do |spec|
     "lib/thm/version.rb",
     "lib/thm/dataservices/geolocation/geolocation.rb",
     "lib/thm/dataservices/trafviz/trafviz.rb",
+    "lib/thm/dataservices/external.rb",
     "js/jquery.min.js",
     "js/chartkick.js",
     "js/JSXTransformer.js",
