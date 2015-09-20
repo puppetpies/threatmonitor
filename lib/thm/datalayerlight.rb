@@ -39,13 +39,17 @@ module DatalayerLight
         puts "Port:     #@port"
         puts "Dbname:   #@dbname"
       end
-      @db.connect(user = "#@username", 
-          passwd = "#@password", 
-          lang = "sql", 
-          host="#@hostname", 
-          port = @port, 
-          db_name = "#@dbname", 
-          auth_type = "SHA256")
+      begin
+        @db.connect(user = "#@username", 
+            passwd = "#@password", 
+            lang = "sql", 
+            host="#@hostname", 
+            port = @port, 
+            db_name = "#@dbname", 
+            auth_type = "SHA256")
+      rescue Errno::EHOSTUNREACH
+        puts "Please check if the server is running ?"
+      end
       @db.auto_commit(@autocommit)
     end
     
