@@ -32,14 +32,15 @@ module Thm
   class DataServices::Trafviz
     
     attr_writer :reqtable, :reqtableua, :debug
-    
+    attr_reader :makeurl_last
+
     # For refinement of print_stats 
     using TimeWarp
     
     def initialize
       @debug = false
       @reqtable, @reqtableua = String.new, String.new
-      @makeurl = String.new
+      @makeurl_last = String.new
     end
     
     def makeurl(data)
@@ -54,7 +55,7 @@ module Thm
           requestn = n.split(" ")[1]
         end
       }
-      @makeurl = "http://#{hostn}#{requestn}"
+      @makeurl_last = "http://#{hostn}#{requestn}"
       puts "\e[1;37mURL: http://#{hostn}#{requestn} \e[0m\ "
     end
 
@@ -160,7 +161,7 @@ module Thm
       }
       # Store the URL in the JSON unless its blank
       # Build JSON Manually as i bet its faster than using some JSON encoder where it has to convert from Array etc.
-      json_data_pieces << "'url' => \"#{@makeurl}\",\n" unless @makeurl == ""
+      json_data_pieces << "'url' => \"#{@makeurl_last}\",\n" unless @makeurl_last == ""
       # SQL for Datastore
       begin
         # Remove last , to fix hash table
@@ -193,6 +194,149 @@ module Thm
       return text
     end
 
+  end
+
+end
+
+module Thm
+
+  class DataServices::Trafviz::FilterManager
+
+    attr_reader :bookmarks, :pcapsetfilter
+    
+    def initialize
+      @bookmarks = Array.new
+      @bkm = MyMenu.new
+      @bkm.settitle("Welcome to Trafviz")
+      @bkm.mymenuname = "Trafviz"
+      @bkm.prompt = "Trafviz"
+      @pcapsetfilter = String.new
+    end
+
+    def read(file)
+      b = 0
+      File.open("#{Dir.home}/.thm/#{file}", 'r') {|n|
+        n.each_line {|l|
+          puts "\e[1;36m#{b})\e[0m\ #{l}"
+          @bookmarks[b] = l
+          b += 1
+        }
+      }
+    end
+
+    def write(file)
+      @bkm.mymenuname = "Filters"
+      @bkm.prompt = "\e[1;33m\Set filter>\e[0m\ "
+      pcapfilter = @bkm.definemenuitem("selectfilter", true) do
+        # Just needs value returned via readline block into addfilter
+      end
+      fltvalid = validate_filter?("#{pcapfilter}")
+      if fltvalid == true
+        File.open("#{Dir.home}/.thm/#{file}", 'a') {|n| # Append to filter file
+          n.puts("#{addfilter}")
+        }
+      end
+    end
+    
+    def set_defaults(file)
+      # Add default example filters
+      File.open("#{Dir.home}/.thm/#{file}", 'w') {|n|
+        n.puts("webtraffic: tcp dst port 80")
+        n.puts("sourceportrange: tcp src portrange 1024-65535")
+      }
+    end
+
+    def validate_filter?(filter)
+      begin
+        Pcap::Filter.compile("#{filter}")
+        puts "Filter Compile #{filter}"
+        return true
+      rescue Pcap::PcapError => e
+        pp e
+        return false
+      end
+    end
+    
+    def build_filter_menu
+      @bkm.settitle("Welcome to Trafviz")
+      @bkm.mymenuname = "Trafviz"
+      @bkm.prompt = "Trafviz"
+      @bkm.debug = 3
+      pp @bookmarks
+      @bookmarks.each {|n|
+        func_name = n.split(":")[0]
+        pcap_filter = n.split(":")[1].lstrip
+        puts "#{pcap_filter}"
+        # Instance Eval probably nicer
+        fltvalid = validate_filter?("#{pcap_filter}") # Because validate_filter? won't exist inside instance_eval
+        @bkm.instance_eval do
+          pp fltvalid
+          if fltvalid == true
+            definemenuitem("#{func_name}") do
+              @pcapsetfilter = "#{pcap_filter}"
+              #thm = DataServices::Trafviz::Main.new
+            end
+            additemtolist("#{func_name}: #{pcap_filter}", "#{func_name};")
+          end
+        end
+      }
+      @bkm.instance_eval do
+        definemenuitem("showfilter") do
+          puts "Filter: #{@pcapsetfilter}"
+        end
+        additemtolist("Show Current Filter", "showfilter;")
+      end
+      @bkm.additemtolist("Display Menu", "showmenu;")
+      @bkm.additemtolist("Toggle Menu", "togglemenu;")
+      @bkm.additemtolist("Exit Trafviz", "exit;")
+      @bkm.menu!
+    end
+        
+    def load_filters(file)
+      if File.exists?("#{Dir.home}/.thm/#{file}")
+        read(file)
+      else
+        set_defaults(file)
+        read(file)
+      end
+      build_filter_menu
+    end
+    
+  end
+  
+end
+
+# Main class / Startup
+
+module Thm
+
+  class DataServices::Trafviz::Main
+
+    attr_accessor :startup
+    
+    def initialize
+      @filter_const = Array.new
+      @startup = String.new
+      @thm = Thm::DataServices::Trafviz::FilterManager.new
+    end
+
+    def addfilter(const, filter)
+      if @thm.validate_filter?(filter) == true
+        filtercode = %Q{#{const} = Pcap::Filter.new('#{filter}', @trafviz.capture)}
+        @filter_const << "#{const})"
+        eval(filtercode)
+      end
+    end
+    
+    def commitfilters
+      flts = @filter_const.join(" | ") # Build string of CONST names
+      commitcode = %Q{@trafviz.add_filter(#{flts})}
+      eval(flts)
+    end
+    
+    def run!
+      @trafviz = Pcaplet.new(@startup)
+    end
   end
 
 end
