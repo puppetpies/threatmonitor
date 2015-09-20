@@ -24,8 +24,12 @@ module Thm
     
     def apiget(url)
       uri = URI.parse("#{url}")
-      #puts "Request URI: #{url}"
+      puts "Request URI: #{url}" unless @debug == false
       http = Net::HTTP.new(uri.host, uri.port)
+      if url =~ /^https:/
+        http.use_ssl = true
+        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      end      
       begin
         response = http.request(Net::HTTP::Get.new(uri.request_uri))
         puts response.body unless @debug == false
@@ -37,7 +41,7 @@ module Thm
     
     def apipost(url, body="")
       uri = URI.parse("#{url}")
-      #puts "Request URI: #{url}"
+      puts "Request URI: #{url}" unless @debug == false
       http = Net::HTTP.new(uri.host, uri.port)
       request = Net::HTTP::Post.new(uri.request_uri)
       request.set_content_type("application/json")
