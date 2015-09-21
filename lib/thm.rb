@@ -70,6 +70,24 @@ module Tools
   
 end
 
+module TextProcessing
+
+
+    def text_highlighter(text)
+      keys = ["Linux", "Java", "Android", "iPhone", "Mobile", "Chrome", 
+               "Safari", "Mozilla", "Gecko", "AppleWebKit", "Windows", 
+               "MSIE", "Win64", "Trident", "wispr", "PHPSESSID", "JSESSIONID",
+               "AMD64", "Darwin", "Macintosh", "Mac OS X", "Dalvik", "text/html", "xml"]
+      cpicker = [2,3,4,1,7,5,6] # Just a selection of colours
+      keys.each {|n|
+        text.gsub!("#{n}", "\e[4;3#{cpicker[rand(cpicker.size)]}m#{n}\e[0m\ \e[0;32m".strip)
+      }
+      return text
+    end
+    
+
+end
+
 # Load Database drivers
 require File.expand_path(File.join(
         File.dirname(__FILE__),
