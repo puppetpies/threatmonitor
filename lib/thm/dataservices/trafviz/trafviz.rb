@@ -92,7 +92,7 @@ module Thm
       when lkey == "range"
         catch_header(lkey) if @debug == true
         return true
-      when lkey =~ /^get |^post /
+      when lkey =~ %r=^get |^post |^head =
         catch_header(lkey, "Seen this unsure why it even occurs yet !") if @debug == true
         return true
       else
