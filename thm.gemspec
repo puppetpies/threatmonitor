@@ -38,6 +38,7 @@ Gem::Specification.new do |spec|
     "lib/thm/dataservices/geolocation/geolocation.rb",
     "lib/thm/dataservices/trafviz/trafviz.rb",
     "lib/thm/dataservices/external.rb",
+    "lib/thm/dataservices/safebrowsing_api.rb",
     "js/jquery.min.js",
     "js/chartkick.js",
     "js/JSXTransformer.js",
