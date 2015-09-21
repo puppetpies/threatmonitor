@@ -17,7 +17,7 @@ module Thm
     def initialize
       super
     end
-  
+    
     def handle_response?(code)
       if code == "200"
         return code
@@ -48,6 +48,7 @@ module Thm
         return false
       end
     end
+
   end
 
 end
