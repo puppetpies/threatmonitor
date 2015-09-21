@@ -26,7 +26,7 @@ module Thm
       uri = URI.parse("#{url}")
       puts "Request URI: #{url}" unless @debug == false
       http = Net::HTTP.new(uri.host, uri.port)
-      if url =~ /^https:/
+      if url =~ %r=^https:=
         http.use_ssl = true
         http.verify_mode = OpenSSL::SSL::VERIFY_NONE
       end      

@@ -42,7 +42,7 @@ module Thm
       response = apiget(url)
       print "Response: "
       pp response
-      if handle_response?(response.code) =~ /^200|^204/
+      if handle_response?(response.code) =~ %r=^200|^204=
         return [response.code, response.body]
       else
         return false
