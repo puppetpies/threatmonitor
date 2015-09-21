@@ -75,23 +75,25 @@ module Thm
     end
     
     # This is just an informal function when in debug mode
-    def hit_header(hdrs, comment="")
-      puts "Hit: #{hdrs} Header comment: #{comment}"
+    def catch_header(hdrs, comment="")
+      print "Caught: #{hdrs} "
+      puts "Header comment: #{comment}" unless comment == ""
     end
     
     # Cookie ommit as we don't want to steal cookie data and pointless to store.
     # Other useless headers / slight issues
+    # You can now add a comment to catch_header if you like
     def filter_header?(lkey)
       puts "MY LKEY: |#{lkey}|" if @debug == true
       case 
       when lkey == "cookie"
-        hit_header(lkey) if @debug == true
+        catch_header(lkey) if @debug == true
         return true
       when lkey == "range"
-        hit_header(lkey) if @debug == true
+        catch_header(lkey) if @debug == true
         return true
       when lkey =~ /^get |^post /
-        hit_header(lkey, "Seen this unsure why it even occurs yet !") if @debug == true
+        catch_header(lkey, "Seen this unsure why it even occurs yet !") if @debug == true
         return true
       else
         return false
@@ -182,17 +184,7 @@ module Thm
       end
     end
     
-    def text_highlighter(text)
-      keys = ["Linux", "Java", "Android", "iPhone", "Mobile", "Chrome", 
-              "Safari", "Mozilla", "Gecko", "AppleWebKit", "Windows", 
-              "MSIE", "Win64", "Trident", "wispr", "PHPSESSID", "JSESSIONID",
-              "AMD64", "Darwin", "Macintosh", "Mac OS X", "Dalvik", "text/html", "xml"]
-      cpicker = [2,3,4,1,7,5,6] # Just a selection of colours
-      keys.each {|n|
-        text.gsub!("#{n}", "\e[4;3#{cpicker[rand(cpicker.size)]}m#{n}\e[0m\ \e[0;32m".strip)
-      }
-      return text
-    end
+    include TextProcessing
 
   end
 
