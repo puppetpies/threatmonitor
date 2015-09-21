@@ -179,7 +179,7 @@ HTTP_RESPONSE = Pcap::Filter.new('tcp src portrange 1024-65535', @trafviz.captur
         tv.makeurl(data_orig)
 	makeurl_last = CGI.escape(tv.makeurl_last)
 	if instance_variable_defined?("@sb")
-	  @sb.debug = true        
+	  @sb.debug = @debug        
 	  @sb.lookup("#{SAFEBROWSING_URL}#{makeurl_last}")
 	end
         # Process data and prepare then send elsewhere
