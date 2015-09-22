@@ -31,7 +31,10 @@ module Thm
     HTTP_REQUEST_TABLE = "http_traffic_json"
     HTTP_RESPONSE_TABLE = "http_traffic_json"
     HTTP_REQUEST_TABLE_UA = "http_traffic_ua"
-    
+    # Common HTTP / HTTPS data ports for Trafviz    
+    HTTP_PORTS = [80, 3128, 8000, 8080, 8088, 8888]
+    HTTPS_PORTS = [443, 444, 3129, 8443]
+
     # Misc
     SNAPLENGTH = 65536
     INTERFACE = "eth0"
