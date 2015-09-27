@@ -16,6 +16,7 @@ require 'chartkick'
 require 'sinatra/base'
 require 'slim'
 require 'colorize'
+require 'keycounter'
 
 require File.expand_path(File.join(
         File.dirname(__FILE__),
@@ -37,42 +38,6 @@ class Sinatra::Base
     
   end
   
-end
-
-
-class Geocounter
-
-  # Create / Add to instance variable
-  def geocount(country)
-    country.gsub!(" ", "_") # no spaces or case
-    if !instance_variable_get("@#{country}")
-      instance_variable_set("@#{country}", 1)
-    else
-      instance_variable_set("@#{country}", instance_variable_get("@#{country}") + 1)
-    end
-    puts "Country: #{country} Value: "+instance_variable_get("@#{country}").to_s
-  end
-
-  # Read a single country
-  def geocount_reader(country)
-    country.gsub!(" ", "_") # no spaces or case
-    valnum = instance_variable_get("@#{country}")
-    return valnum
-  end
-
-  # Compile in array with the totals of all instance variables
-  def geocount_compile
-    countrycounts = Array.new
-    # You can't really inherit this class as the other class may also contain instance variables
-    # its not really an exact logic this class only works alone.
-    instance_variables.each {|n|
-      t = n.to_s.gsub("@", "")
-      countrycounts << ["#{t}", instance_variable_get("#{n}")]
-    }
-    return countrycounts
-    countrycounts
-  end
-
 end
 
 module ThmUI extend self
@@ -204,14 +169,14 @@ module ThmUI extend self
       query = "select count(*) as num2,  ip_dst from wifi_ippacket a JOIN wifi_#{proto}packet b on (a.guid = b.guid) JOIN service_definitions s on (s.num = b.#{proto}_dport) where #{proto}_dport > 0 and #{proto}_dport < 10000 and s.protocol = '#{proto.upcase}' and ip_dst not in ('255.255.255.255') group by b.#{proto}_dport, a.ip_dst;"
       resusrcnt = @sessobj.query("#{query}")
       rowusrcnt = Array.new
-      @gcnt = Geocounter.new
+      @gcnt = Keycounter.new
       while row = resusrcnt.fetch_hash do
         num2 = row["num2"].to_s
         ip_dst = row["ip_dst"].to_s
         location = geoiplookup(ip_dst)
         locfix = location.to_s.gsub("(", "").gsub(")", "") # Yawn
         if location != nil or location == "" # You can't have a blank or nil instance_variable
-          @gcnt.geocount("#{locfix}")
+          @gcnt.keycount("#{locfix}")
         end
         rowusrcnt << ["#{ip_dst} #{location}", "#{num2}"]
       end    
@@ -259,7 +224,7 @@ module ThmUI extend self
       @rowusrcnt5 = toptalkers("udp")
       # Top UDP/IP Talkers
       @rowusrcnt6 = toptalkers("tcp")
-      @rowgeocount = @gcnt.geocount_compile
+      @rowgeocount = @gcnt.keycount_compile
       puts "Geo Data:"
       @rowgeocount.each {|n, x|
         puts "#{n} #{x}"
