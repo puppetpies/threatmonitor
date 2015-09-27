@@ -78,9 +78,8 @@ if obj.user_exists?("admin") == true
   end  
 else
   # Create admin user if none exists
-  #obj.add_user
-  #obj.delete_user
-  #obj.set_password
+  obj.add_user
+  obj.set_password
 end
 
 
