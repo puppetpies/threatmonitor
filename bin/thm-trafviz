@@ -177,11 +177,11 @@ HTTP_RESPONSE = Pcap::Filter.new('tcp src portrange 1024-65535', @trafviz.captur
         puts "\e[4;36mGeo Location:\e[0m\ \n\e[0;35m#{geo} \e[0m\ "
         puts "\e[4;36mRequest Data:\e[0m\ \n\e[0;32m#{data_highlight} \e[0m\ "
         tv.makeurl(data_orig)
-	makeurl_last = CGI.escape(tv.makeurl_last)
-	if instance_variable_defined?("@sb")
-	  @sb.debug = @debug        
-	  @sb.lookup("#{SAFEBROWSING_URL}#{makeurl_last}")
-	end
+        makeurl_last = CGI.escape(tv.makeurl_last)
+        if instance_variable_defined?("@sb")
+          @sb.debug = @debug        
+          @sb.lookup("#{SAFEBROWSING_URL}#{makeurl_last}")
+        end
         # Process data and prepare then send elsewhere
         query_return_sql = tv.request_filter(data)
         # Store data into Datastore
