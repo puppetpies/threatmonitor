@@ -24,7 +24,7 @@ CREATE TABLE "threatmonitor".geoipdata_ipv4blocks_city (
 
 CREATE INDEX cindex_ipv4_network ON "threatmonitor".geoipdata_ipv4blocks_city(network);
 CREATE INDEX cindex_ipv4_geoname_id ON "threatmonitor".geoipdata_ipv4blocks_city(geoname_id);
-COPY 2519918 OFFSET 2 RECORDS INTO "threatmonitor".geoipdata_ipv4blocks_city FROM '/data2/MaxMind/GeoLite2-City-CSV_20150602/GeoLite2-City-Blocks-IPv4.csv' USING DELIMITERS ',', '\n', '';
+COPY 3030997 OFFSET 2 RECORDS INTO "threatmonitor".geoipdata_ipv4blocks_city FROM '/home/brian/Downloads/GeoLite2-City-CSV_20151006/GeoLite2-City-Blocks-IPv4.csv' USING DELIMITERS ',', '\n', '';
 
 
 DROP TABLE "threatmonitor".geoipdata_locations_city;
@@ -45,7 +45,7 @@ CREATE TABLE "threatmonitor".geoipdata_locations_city (
 );
 
 CREATE INDEX cindex_country_geoname_id ON "threatmonitor".geoipdata_locations_city(geoname_id);
-COPY 80006 OFFSET 2 RECORDS INTO "threatmonitor".geoipdata_locations_city FROM '/data2/MaxMind/GeoLite2-City-CSV_20150602/GeoLite2-City-Locations-en.csv' USING DELIMITERS ',', '\n', '';
+COPY 91509 OFFSET 2 RECORDS INTO "threatmonitor".geoipdata_locations_city FROM '/home/brian/Downloads/GeoLite2-City-CSV_20151006/GeoLite2-City-Locations-en.csv' USING DELIMITERS ',', '\n', '';
 
 
 DROP TABLE "threatmonitor".geoipdata_ipv4blocks_country;
@@ -60,7 +60,7 @@ CREATE TABLE "threatmonitor".geoipdata_ipv4blocks_country (
 
 CREATE INDEX index_ipv4_network ON "threatmonitor".geoipdata_ipv4blocks_country(network);
 CREATE INDEX index_ipv4_geoname_id ON "threatmonitor".geoipdata_ipv4blocks_country(geoname_id);
-COPY 169357 OFFSET 2 RECORDS INTO "threatmonitor".geoipdata_ipv4blocks_country FROM '/data2/MaxMind/GeoLite2-Country-CSV_20150602/GeoLite2-Country-Blocks-IPv4.csv' USING DELIMITERS ',', '\n', '';
+COPY 178589 OFFSET 2 RECORDS INTO "threatmonitor".geoipdata_ipv4blocks_country FROM '/home/brian/Downloads/GeoLite2-Country-CSV_20151006/GeoLite2-Country-Blocks-IPv4.csv' USING DELIMITERS ',', '\n', '';
 
 DROP TABLE "threatmonitor".geoipdata_locations_country;
 CREATE TABLE "threatmonitor".geoipdata_locations_country (
@@ -74,7 +74,7 @@ CREATE TABLE "threatmonitor".geoipdata_locations_country (
 );
 
 CREATE INDEX index_country_geoname_id ON "threatmonitor".geoipdata_locations_country(geoname_id);
-COPY 250 OFFSET 2 RECORDS INTO "threatmonitor".geoipdata_locations_country FROM '/data2/MaxMind/GeoLite2-Country-CSV_20150602/GeoLite2-Country-Locations-en.csv' USING DELIMITERS ',', '\n', '';
+COPY 250 OFFSET 2 RECORDS INTO "threatmonitor".geoipdata_locations_country FROM '/home/brian/Downloads/GeoLite2-Country-CSV_20151006/GeoLite2-Country-Locations-en.csv' USING DELIMITERS ',', '\n', '';
 
 plan SELECT continent_name, country_name 
 FROM "threatmonitor".geoipdata_ipv4blocks_country a 
