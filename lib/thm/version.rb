@@ -3,9 +3,9 @@ module Thm #:nodoc:
   module VERSION #:nodoc:
 
     MAJOR = 0
-    MINOR = 4
-    TINY = 5
-    CODENAME = "The Isnis"
+    MINOR = 5
+    TINY = 7
+    CODENAME = "World on fire !"
 
     STRING = [MAJOR, MINOR, TINY].join('.')
 
