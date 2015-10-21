@@ -220,5 +220,3 @@ HTTP_RESPONSE = Pcap::Filter.new('tcp src portrange 1024-65535', @trafviz.captur
   }
 
 }
-
-
