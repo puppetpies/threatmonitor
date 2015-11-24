@@ -1,5 +1,6 @@
 
-CREATE USER "threatmonitor" WITH PASSWORD 'dk3rbi9l' NAME 'Threatmonitor' SCHEMA "sys";
+CREATE USER "threatmonitor" WITH ENCRYPTED PASSWORD 'f0d40f67042fcd9be29a92253350d7b2f138de24ebf6d7aa8a95f00722db95d6ff4520627593568aad2412e06709354667abdd43684b5361faf8db637db490d9' NAME 'Thre
+atmonitor' SCHEMA "sys";
 CREATE SCHEMA "threatmonitor" AUTHORIZATION "threatmonitor";
 ALTER USER "threatmonitor" SET SCHEMA "threatmonitor";
 
