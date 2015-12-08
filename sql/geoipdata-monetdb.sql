@@ -93,16 +93,16 @@ LIMIT 10;
 
 -- SELECT network FROM "threatmonitor".geoipdata_ipv4blocks_country a JOIN WHERE network LIKE '23.%' LIMIT 5;
  
--- PLAN SELECT LEFT(network, 8) as net, locale_code, continent_code, continent_name, country_name, country_iso_code 
--- FROM "threatmonitor".geoipdata_ipv4blocks_country a 
--- JOIN "threatmonitor".geoipdata_locations_country b 
--- ON (a.geoname_id = b.geoname_id) 
--- JOIN "threatmonitor".wifi_ippacket c
--- ON (c.ip_dst LIKE LEFT(network, 8))
--- JOIN "threatmonitor".wifi_tcppacket d
--- ON (c.guid = d.guid)
--- WHERE network LIKE '23.%' 
--- GROUP BY a.network, b.locale_code, b.continent_code, b.continent_name, b.country_name, b.country_iso_code
--- LIMIT 100;
+SELECT LEFT(network, 8) as net, locale_code, continent_code, continent_name, country_name, country_iso_code 
+FROM "threatmonitor".geoipdata_ipv4blocks_country a 
+JOIN "threatmonitor".geoipdata_locations_country b 
+ON (a.geoname_id = b.geoname_id) 
+JOIN "threatmonitor".ippacket c
+ON (c.ip_dst LIKE LEFT(network, 8))
+JOIN "threatmonitor".tcppacket d
+ON (c.guid = d.guid)
+WHERE network LIKE '23.%' 
+GROUP BY a.network, b.locale_code, b.continent_code, b.continent_name, b.country_name, b.country_iso_code
+LIMIT 100;
 
 
