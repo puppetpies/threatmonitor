@@ -155,10 +155,10 @@ a.menu!
 =end
 
 @trafviz = Pcaplet.new(startup)
-puts "tcp dst port #{HTTP_PORTS.join(" or tcp port ")}"
-HTTP_REQUEST = Pcap::Filter.new("tcp dst port #{HTTP_PORTS.join(" or tcp port ")}", @trafviz.capture)
+pcap_filter = "tcp port #{HTTP_PORTS.join(" or tcp port ")}"
+HTTP_REQUEST = Pcap::Filter.new("#{pcap_filter}", @trafviz.capture)
 HTTP_RESPONSE = Pcap::Filter.new('tcp src portrange 1024-65535', @trafviz.capture)
-
+puts "Pcap Filter: #{pcap_filter}"
 @sb = Thm::DataServices::Safebrowsing.new unless @safebrowsing_enabled == "false"
 
 @trafviz.add_filter(HTTP_REQUEST | HTTP_RESPONSE)
