@@ -125,10 +125,9 @@ module Thm
       guid = Tools::guid
       cols, vals = String.new, String.new
       lkey, rkey = String.new, String.new
-      sql_ua = String.new
-      json_data_pieces = String.new
+      sql_ua, json_data_pieces = String.new, String.new
       t = 0
-      json_data_hdr = "@json_template = { 'http' => { "
+      json_data_hdr = '{ "http": { '
       json_data_ftr = " } }"
       sql = "INSERT INTO #{@reqtable} (recv_time,recv_date,guid,json_data) "
       data.each_line {|n|
@@ -155,7 +154,7 @@ module Thm
               prerkeyins = rkey.gsub('"', '') # Strip Quotes
               prerkeyins = "blank" if prerkeyins.strip == "" # Seems JSON values can't be "accept":""
               puts "Found Blank Value!!!" if prerkeyins == "blank"
-              json_data_pieces << "'#{lkey}' => \"#{prerkeyins}\",\n" if lkey != "useragent"
+              json_data_pieces << %Q{"#{lkey}": "#{prerkeyins}",} if lkey != "useragent"
             end
           end
           t += 1
@@ -163,16 +162,19 @@ module Thm
       }
       # Store the URL in the JSON unless its blank
       # Build JSON Manually as i bet its faster than using some JSON encoder where it has to convert from Array etc.
-      json_data_pieces << "'url' => \"#{@makeurl_last}\",\n" unless @makeurl_last == ""
+      json_data_pieces << %Q{"url":"#{@makeurl_last}","} unless @makeurl_last == ""
       # SQL for Datastore
       begin
         # Remove last , to fix hash table
-        json_data_pieces.sub!(%r{,\n$}, "")
-        json_eval = %Q{#{json_data_hdr}#{json_data_pieces}#{json_data_ftr}}
-        puts "\e[4;36mJSON Data:\e[0m\ \n#{json_eval}"
-        eval(json_eval) # Unsure why a local variable works for this in IRB
-        json_data = @json_template.to_json
-        remove_instance_variable("@json_template") # Hence remove instance variable here
+        json_data_pieces.sub!(%r{,"$}, "")
+        json_data = "#{json_data_hdr}#{json_data_pieces}#{json_data_ftr}"
+        puts "\e[4;36mJSON Data:\e[0m\ \n#{json_data}"
+        #eval(json_eval) # Unsure why a local variable works for this in IRB
+        #json_data = json_eval.to_json.gsub('"', '')
+        #json_data.gsub!("\\", '"').gsub!('"n', '')
+        #json_data.gsub!(" =>", ":")
+        puts "JSON Data: #{json_data}" if @debug == true
+        #remove_instance_variable("@json_template") # Hence remove instance variable here
         # Added GUID as i could extend TCP/IP capture suites in the future for HTTP traffic 
         sql = "#{sql}VALUES (NOW(), NOW(), '#{guid}', '#{json_data}');"
         flt.watch('stop')
@@ -190,6 +192,7 @@ module Thm
 
 end
 
+=begin
 module Thm
 
   class DataServices::Trafviz::FilterManager
@@ -332,3 +335,4 @@ module Thm
   end
 
 end
+=end
