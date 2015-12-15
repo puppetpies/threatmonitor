@@ -87,7 +87,7 @@ mode = @modeparam
 
 if mode == "database"
   # Send data from Database to RabbitMQ for Fanout etc
-  ippacketsql = "SELECT * FROM \"threatmonitor\".#{obj.tblname_ippacket} LIMIT 300 OFFSET 400000"
+  ippacketsql = "SELECT * FROM \"threatmonitor\".#{obj.tblname_ippacket};"
   obj.from_db_to_mq(ippacketsql)
 
 elsif mode == "capture"
