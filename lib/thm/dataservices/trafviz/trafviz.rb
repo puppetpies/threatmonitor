@@ -169,12 +169,7 @@ module Thm
         json_data_pieces.sub!(%r{,"$}, "")
         json_data = "#{json_data_hdr}#{json_data_pieces}#{json_data_ftr}"
         puts "\e[4;36mJSON Data:\e[0m\ \n#{json_data}"
-        #eval(json_eval) # Unsure why a local variable works for this in IRB
-        #json_data = json_eval.to_json.gsub('"', '')
-        #json_data.gsub!("\\", '"').gsub!('"n', '')
-        #json_data.gsub!(" =>", ":")
         puts "JSON Data: #{json_data}" if @debug == true
-        #remove_instance_variable("@json_template") # Hence remove instance variable here
         # Added GUID as i could extend TCP/IP capture suites in the future for HTTP traffic 
         sql = "#{sql}VALUES (NOW(), NOW(), '#{guid}', '#{json_data}');"
         flt.watch('stop')
