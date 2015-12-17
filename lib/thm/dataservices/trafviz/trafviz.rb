@@ -115,7 +115,7 @@ module Thm
     end
     
     # Filter request data and build query
-    def request_filter(data, keysamples=2000)
+    def request_filter(data)
       flt = Stopwatch.new
       flt.watch('start')
       if !request_valid?(data)
