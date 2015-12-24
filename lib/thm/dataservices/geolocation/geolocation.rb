@@ -86,8 +86,18 @@ module Thm
     define_component :country
     define_component :city
 
+    # Check IP belongs to the internet.
+    def checkip?(ip)
+      if ip =~ %r=^172.|^192.168.|^10.$=
+        return "Private Class C IP Range"
+      elsif ip =~ %r=^127.$=
+        return "Local Loopback"
+      end
+    end
+
     # Geo set to false by default for normal operation
     def geoiplookup(ip, geo=false)
+      checkip?(ip)
       t = country(ip, geo)
       city(ip, geo)
       unless t == false
