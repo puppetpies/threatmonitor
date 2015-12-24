@@ -141,19 +141,6 @@ startup = "-s #{@snaplength} -n -i #{@interface}"
 puts "Trafviz - Startup Parameters: #{startup}"
 puts "Safebrowsing URL: #{SAFEBROWSING_URL}" unless @safebrowsing_enabled == "false"
 
-=begin
-FILTERLIST = 'filters.lst'
-a = Thm::DataServices::Trafviz::FilterManager.new
-a.load_filters("#{FILTERLIST}")
-a.instance_eval do
-  definemenuitem("addfilter") do
-    puts "Filter: #{@pcapsetfilter}"
-  end
-  additemtolist("Add New Filter", "write('#{FILTERLIST}');")
-end
-a.menu!
-=end
-
 @trafviz = Pcaplet.new(startup)
 pcap_filter = "tcp port #{HTTP_PORTS.join(" or tcp port ")}"
 HTTP_REQUEST = Pcap::Filter.new("#{pcap_filter}", @trafviz.capture)
