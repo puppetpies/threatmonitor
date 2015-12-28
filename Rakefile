@@ -36,6 +36,7 @@ Gem::Specification.new do |spec|
     "thm-privileges.rb",
     "service_definitions.csv",
     "lib/thm.rb",
+    "lib/monkeypatches.rb",
     "lib/thm/consumer.rb",
     "lib/thm/dataservices.rb",
     "lib/thm/fileservices.rb",
