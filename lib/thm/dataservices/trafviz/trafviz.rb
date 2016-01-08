@@ -76,7 +76,7 @@ module Thm
     
     # This is just an informal function when in debug mode
     def catch_header(hdrs, comment="")
-      print "Caught: #{hdrs} "
+      puts "Caught: #{hdrs} "
       puts "Header comment: #{comment}" unless comment == ""
     end
     
