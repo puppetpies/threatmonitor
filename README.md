@@ -9,6 +9,8 @@ Threatmonitor - Packet Analysis suite with MonetDB / MySQL - RabbitMQ & PCap int
   \--/
 
 
+[![Gem Version](https://badge.fury.io/rb/thm.svg)](https://badge.fury.io/rb/thm)
+
 ![GeoIP](https://raw.githubusercontent.com/puppetpies/threatmonitor/master/screenshot-3-geo.jpg)
 
 Getting Started
