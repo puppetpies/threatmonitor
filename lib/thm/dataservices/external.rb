@@ -59,7 +59,7 @@ module Thm
       begin
         response = http.request(Net::HTTP::Delete.new(uri.request_uri))
       rescue
-        puts "Error posting data"
+        raise Exception, "Error posting data"
       end
     end
 
