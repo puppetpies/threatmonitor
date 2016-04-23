@@ -28,7 +28,7 @@ module Thm
           require "#{Dir.home}/.thm/#{file}"
         end
       rescue
-        puts "Failed to load something went wrong check permissions !"
+        raise Exception, "Failed to load something went wrong check permissions !"
       end
     end
 
@@ -37,7 +37,6 @@ module Thm
       if Dir.exists?("#{Dir.home}/.thm") == false
         Dir.mkdir("#{Dir.home}/.thm")
         puts "Creating .thm home subfolder copying config.rb"
-        #puts "#{File.getwd}"
         File.open(File.expand_path(File.join(File.dirname(__FILE__), "../../#{file}")), 'r') {|n|
           n.each_line {|l|
             @fdata << l
@@ -45,12 +44,10 @@ module Thm
         }
       end
       begin
-        #puts "FDATA: #{@fdata}"
-        #puts "Begin"
         conf_loader("#{file}")
         conf_loader("config-original.rb", false)
       rescue
-        puts "Error loading config from home directory"
+        raise Exception, "Error loading config from home directory"
       end
     end
 
