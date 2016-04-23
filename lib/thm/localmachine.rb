@@ -29,7 +29,7 @@ module Thm
         }
         capture.dump_close
       rescue
-        puts "Make sure the interface name is correct and you have enough disk space"
+        raise Exception, "Make sure the interface name is correct and you have enough disk space"
         exit
       end      
     end
