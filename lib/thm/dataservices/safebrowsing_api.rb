@@ -41,11 +41,14 @@ module Thm
     def lookup(url)
       response = apiget(url)
       print "Response: "
-      pp response
-      if handle_response?(response.code) =~ %r=^200|^204=
-        return [response.code, response.body]
-      else
-        return false
+      begin
+        if handle_response?(response.code) =~ %r=^200|^204=
+          return [response.code, response.body]
+        else
+          return false
+        end
+      rescue NoMethodError
+        raise Exception, "Invalid Safebrowsing API Response"
       end
     end
 
