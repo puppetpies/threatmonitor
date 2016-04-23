@@ -24,16 +24,16 @@ module Thm
       elsif code == "204"
         return code
       elsif code == "400"
-        puts "Bad Request—The HTTP request was not correctly formed. The client did not provide all required CGI parameters."
+        raise Expection, "Bad Request—The HTTP request was not correctly formed. The client did not provide all required CGI parameters."
         return false
       elsif code == "401"
-        puts "Not Authorized—The client id is invalid."
+        raise Expection, "Not Authorized—The client id is invalid."
         return false      
       elsif code == "503"
-        puts "Service Unavailable"
+        raise Expection, "Service Unavailable"
         return false
       elsif code == "505"
-        puts "HTTP Version Not Supported—The server CANNOT handle the requested protocol major version."
+        raise Expection, "HTTP Version Not Supported—The server CANNOT handle the requested protocol major version."
         return false
       end    
     end
