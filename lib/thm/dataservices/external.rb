@@ -29,13 +29,13 @@ module Thm
       if url =~ %r=^https:=
         http.use_ssl = true
         http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      end      
+      end
       begin
         response = http.request(Net::HTTP::Get.new(uri.request_uri))
         puts response.body unless @debug == false
-        return response 
+        return response
       rescue
-        puts "Error retrieving data"
+        raise Exception, "Error retrieving data"
       end
     end
     
@@ -49,7 +49,7 @@ module Thm
         request.body = body unless body.empty?
         response = http.request(request)
       rescue
-        puts "Error posting data"
+        raise Exception, "Error posting data"
       end
     end
     
